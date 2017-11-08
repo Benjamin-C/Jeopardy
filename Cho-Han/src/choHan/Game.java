@@ -66,12 +66,12 @@ public class Game {
 				flag = true;
 				rounds = Integer.parseInt(in);
 			}
-		} while (flag);
+		} while (flag == false);
 	}
 	
 	public void playGame() {
 		for(int i = 0; i < rounds; i++) {
-			ui.println("Rount " + i);
+			ui.println("Round " + i);
 			dealer.rollDice();
 			pOne.makeGuess();
 			pTwo.makeGuess();
@@ -81,6 +81,8 @@ public class Game {
 	
 	public void determineResults() {
 		ui.println(dealer.isChoOrHan().getName());
+		checkGuess(pOne);
+		checkGuess(pTwo);
 	}
 	
 	public void checkGuess(Player p) {
@@ -96,5 +98,14 @@ public class Game {
 		ui.println("The final results after " + rounds + " rounds");
 		ui.println("\t" + pOne.getName() + ":" + pOne.getScore() + " points");
 		ui.println("\t" + pTwo.getName() + ":" + pTwo.getScore() + " points");
+		if(pOne.getScore() < pTwo.getScore()) {
+			ui.println(pTwo.getName() + " wins");
+		} else {
+			if(pOne.getScore() == pTwo.getScore()) {
+				ui.println("It's a tie between " + pOne.getName() + pTwo.getName());
+			} else {
+				ui.println(pOne.getName() + " wins");
+			}
+		}
 	}
 }
