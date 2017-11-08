@@ -101,7 +101,7 @@ public class Game {
 		if(pOne.getScore() < pTwo.getScore()) {
 			ui.println(pTwo.getName() + " wins");
 		} else {
-			if(pOne.getScore() == pTwo.getScore()) {
+			if(pOne.getScore() == pTwo.getScore()) { // set score
 				ui.println("It's a tie between " + pOne.getName() + pTwo.getName());
 			} else {
 				ui.println(pOne.getName() + " wins");
