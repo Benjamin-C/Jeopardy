@@ -5,12 +5,14 @@ public class Game {
 	private Player pOne;
 	private Player pTwo;
 	private int rounds;
+	private UserInterface ui;
 	
 	public Game() {
 		dealer = new Dealer();
 		pOne = new Player();
 		pTwo = new Player();
 		rounds = 0;
+		ui = new UserInterface();
 	}
 	
 	public Dealer getDealer() {
@@ -44,7 +46,55 @@ public class Game {
 	public void setRounds(int r) {
 		rounds = r;
 	}
-	public void runGame() {
-		
+
+	public void setUserInterface(UserInterface u) {
+		ui = u;
+	}
+	
+	public void setupGame() {
+		ui.println("What is your name, Player 1?");
+		pOne.setName(ui.getString());
+		ui.println("What is your name, Player 2?");
+		pTwo.setName(ui.getString());
+		String in;
+		boolean flag;
+		do {
+			ui.println("How many rounds?");
+			flag = false;
+			in = ui.getString();
+			if(ui.isNumeric(in)) {
+				flag = true;
+				rounds = Integer.parseInt(in);
+			}
+		} while (flag);
+	}
+	
+	public void playGame() {
+		for(int i = 0; i < rounds; i++) {
+			ui.println("Rount " + i);
+			dealer.rollDice();
+			pOne.makeGuess();
+			pTwo.makeGuess();
+			determineResults();
+		}
+	}
+	
+	public void determineResults() {
+		ui.println(dealer.isChoOrHan().getName());
+	}
+	
+	public void checkGuess(Player p) {
+		if(dealer.isChoOrHan().equals(p.getGuess())) {
+			p.addPoint();
+			ui.println(p.getName() + " has earned a point");
+		} else {
+			ui.println(p.getName() + " has not earned a point");
+		}
+	}
+	
+	public void displayGrandWinner() {
+		ui.println("The final results after " + rounds + " rounds");
+		ui.println("\t" + pOne.getName() + ":" + pOne.getScore() + " points");
+		ui.println("\t" + pTwo.getName() + ":" + pTwo.getScore() + " points");
 	}
 }
