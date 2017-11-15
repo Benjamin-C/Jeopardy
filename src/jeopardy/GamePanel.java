@@ -1,3 +1,5 @@
+//TODO figure out why window resizing can cause drawing issues
+
 package jeopardy;
 
 import java.awt.Color;
@@ -18,6 +20,9 @@ public class GamePanel{
 	private static Team teamGreen;
 	private static Team teamBlue;
 	
+	private static int width;
+	private static int height;
+	
 	public static void setGamePanel(JFrame j) {
 		jf = j;
 	}
@@ -31,7 +36,6 @@ public class GamePanel{
 	
 	public static boolean drawMainPanel(List<Category> cat) {
 		panel = new JPanel() {
-
 			@Override
             public void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -135,14 +139,16 @@ public class GamePanel{
                 	textA = text.substring(0,  loc++);
                 	textB = text.substring(loc, text.length());
                 	twoLine = true;
-                }
-                if(sw > (double) getWidth() * (9d/10d)) {
-                	int loc = text.length() / 2;
-                	while(text.charAt(loc) != ' ') {
-                		loc++;
-                	}
-                	textA = text.substring(0,  loc++);
-                	textB = text.substring(loc, text.length());
+                } else {
+	                if(sw > (double) getWidth() * (9d/10d)) {
+	                	int loc = text.length() / 2;
+	                	while(text.charAt(loc) != ' ') {
+	                		loc++;
+	                	}
+	                	textA = text.substring(0, loc++);
+	                	textB = text.substring(loc, text.length());
+	                	twoLine = true;
+	                }
                 }
                 if(twoLine == true) {
                 	sh = g.getFontMetrics().getHeight();
@@ -170,5 +176,42 @@ public class GamePanel{
 		jf.add(panel);
         jf.validate();
         return true;
+	}
+	
+	public static boolean showScores() {
+		panel = new JPanel() {
+        	@Override
+            public void paintComponent(Graphics g) {
+                super.paintComponent(g);
+				int x = jf.getWidth() / 3;
+				int y = jf.getHeight() / 3;
+				g.setFont(new Font(g.getFont().getName(), Font.PLAIN, 40));
+		        g.setColor(Color.BLACK);
+		        g.fillRect(0,  0,  getWidth(), getHeight());
+				displayScores(teamRed, x, y, g);
+				displayScores(teamYellow, x * 2, y, g);
+				displayScores(teamGreen, x, y * 2, g);
+				displayScores(teamBlue, x * 2, y * 2, g);
+        	}
+		};
+		jf.add(panel);
+        jf.validate();
+		return true;
+	}
+	
+	private static void displayScores(Team team, int cx, int ch, Graphics g) {
+        int sw;
+        int sh = g.getFontMetrics().getHeight();
+        int x;
+        int y;
+        sw = g.getFontMetrics().stringWidth(team.getName());
+        x = cx - (sw / 2);
+		y = ch - (sh / 2);
+		g.setColor(team.getColor());
+		g.drawString(team.getName(), x, y);
+		sw = g.getFontMetrics().stringWidth(Integer.toString(team.getScore()));
+		x = cx - (sw / 2);
+		y = ch + (sh / 2);
+		g.drawString(Integer.toString(team.getScore()), x, y);
 	}
 }

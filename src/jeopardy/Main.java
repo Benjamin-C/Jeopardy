@@ -18,6 +18,11 @@ public class Main{
 		}
 		KeyListen.init();
 		
+		// Null Category
+		List<Category> nullCatList = new ArrayList<Category>();
+		Category nullCat = new Category("null");
+		nullCat.add(new Question("null", "null"));
+		nullCatList.add(nullCat);
 		
 		// System.out.println(roundOne.toString());
 		JFrame jf = new JFrame();
@@ -34,7 +39,7 @@ public class Main{
 			@Override public void keyReleased(KeyEvent e) {KeyListen.keyReleased(e);}
 			@Override public void keyPressed(KeyEvent e) {KeyListen.keyPressed(e);}
 		});
-
+		KeyListen.setQuestions(nullCatList);
 		GamePanel.displayText("Jeopardy");
 	}
 	
@@ -47,7 +52,8 @@ public class Main{
 			roundOne.add(temp);
 		}
 		KeyListen.setQuestions(roundOne);
-		GamePanel.drawMainPanel(roundOne);	
+		GamePanel.drawMainPanel(roundOne);
+		KeyListen.setMode(Mode.RUN);
 	}
 	public static void beginRoundTwo() {
 		List<Category> roundTwo = new ArrayList<Category>();

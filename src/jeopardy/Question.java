@@ -11,14 +11,12 @@ public class Question {
 		question = q;
 		answer = a;
 		points = p;
-		
 	}
 	
 	public Question(String q, String a) {
 		question = q;
 		answer = a;
 		points = 0;
-		
 	}
 	
 	@Override

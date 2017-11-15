@@ -31,7 +31,7 @@ public class KeyListen {
 	private static Team teamYellow = new Team(Color.YELLOW, "Yellow");
 	private static Team teamGreen = new Team(Color.GREEN, "Green");
 	private static Team teamBlue = new Team(Color.CYAN, "Blue");
-	private static Mode mode = Mode.RUN;
+	private static Mode mode = Mode.INIT;
 	private static List<Category> cat;
 	private static List<Team> winners = new ArrayList<Team>();
 	private static Robot robot;
@@ -81,7 +81,7 @@ public class KeyListen {
 		case KeyEvent.VK_SUBTRACT: numMult = numMult * -1; ch = true; break;
 		
 		// cancel question selection
-		case KeyEvent.VK_ESCAPE: {GamePanel.drawMainPanel(cat);exit();} break;
+		case KeyEvent.VK_ESCAPE: {cat.get(nct).getQuestion(npt).setIsUsed(false);GamePanel.drawMainPanel(cat);exit();} break;
 		
 		// Happens when a team buzzes in
 		case KeyEvent.VK_F9: {teamSel = teamRed;} break;
@@ -125,14 +125,18 @@ public class KeyListen {
 		case KeyEvent.VK_F4: {teamMod = teamBlue;} break;
 		
 		case KeyEvent.VK_I: {
-			mode = Mode.SCORE_SET;
-			num = 0;
-			numMult = 1;
+			if(mode != Mode.INIT) {
+				mode = Mode.SCORE_SET;
+				num = 0;
+				numMult = 1;
+			}
 		} break;
 		case KeyEvent.VK_K: {
-			mode = Mode.SCORE_ADD;
-			numMult = 1;
-			num = 0;
+			if(mode != Mode.INIT) {
+				mode = Mode.SCORE_ADD;
+				numMult = 1;
+				num = 0;
+			}
 		} break;
 		case KeyEvent.VK_ENTER: {
 			if(e.getKeyLocation() == 4) {
@@ -155,16 +159,16 @@ public class KeyListen {
 					}
 				} break;
 				default: {} break;
-				}
-				
+				}	
 			} else if(e.getKeyLocation() == 1) {
-				if(mode == Mode.RUN) {
+				switch(mode) {
+				case INIT: moveOn(); break;
+				case RUN: {
 					switch(round) {
-					case 0: {
-						moveOn();
-					} break;
 					case 3: {
 						mode = Mode.WAGER;
+						num = 0;
+						numMult = 1;
 						teamSel = teamRed;
 						GamePanel.displayText(teamSel.getName() + " Team\n");
 					} break;
@@ -176,16 +180,20 @@ public class KeyListen {
 						}
 					} break;
 					}
-				} else {
-					if(mode == Mode.FINAL_JEOPARDY) {
-						mode = Mode.FINAL_CORRECT;
-						teamSel = teamRed;
-						GamePanel.displayText(cat.get(0).getQuestion(0).getAnswer(), teamSel.getColor());
-					}
+				} break;
+				case FINAL_JEOPARDY: {
+					mode = Mode.FINAL_CORRECT;
+					teamSel = teamRed;
+					GamePanel.displayText(cat.get(0).getQuestion(0).getAnswer(), teamSel.getColor());
+				} break;
+				case SCORE: {
+					GamePanel.showScores();
+				}
 				}
 			}
 		} break;
 		case KeyEvent.VK_B: {
+			System.out.println("b");
 			moveOn();
 		} break;
 		} // end of key listeners
@@ -194,6 +202,7 @@ public class KeyListen {
 		// Bodge to prevent f10 from creating errors
 		// Will be removed with the F9-12 buzzing
 		// Presses and releases F10 to undo whatever F10 does
+		// only sort of works
 		if(e.getKeyCode() == KeyEvent.VK_F10) {
 		try {
 				robot.keyPress(KeyEvent.VK_F10);
@@ -217,29 +226,13 @@ public class KeyListen {
 		if(mode != Mode.RESULTS) {
 			GamePanel.displayText(cat.get(0).getQuestion(0).getAnswer(), teamSel.getColor());
 		} else {
-			if(teamRed.getScore() > teamYellow.getScore()) {
-				teamSel = teamRed;
-			} else {
-				teamSel = teamYellow;
-			}
-			if(teamSel.getScore() < teamGreen.getScore()) {
-				teamSel = teamGreen;
-			}
-			if(teamSel.getScore() < teamBlue.getScore()) {
-				teamSel = teamBlue;
-			}
-			if(teamRed.getScore() == teamSel.getScore()) {
-				winners.add(teamRed);
-			}
-			if(teamYellow.getScore() == teamSel.getScore()) {
-				winners.add(teamYellow);
-			}
-			if(teamGreen.getScore() == teamSel.getScore()) {
-				winners.add(teamGreen);
-			}
-			if(teamBlue.getScore() == teamSel.getScore()) {
-				winners.add(teamBlue);
-			}
+			if(teamRed.getScore() > teamYellow.getScore()) {teamSel = teamRed;} else {teamSel = teamYellow;}
+			if(teamSel.getScore() < teamGreen.getScore()) {teamSel = teamGreen;}
+			if(teamSel.getScore() < teamBlue.getScore()) {teamSel = teamBlue;}
+			if(teamRed.getScore() == teamSel.getScore()) {winners.add(teamRed);}
+			if(teamYellow.getScore() == teamSel.getScore()) {winners.add(teamYellow);}
+			if(teamGreen.getScore() == teamSel.getScore()) {winners.add(teamGreen);}
+			if(teamBlue.getScore() == teamSel.getScore()) {winners.add(teamBlue);}
 			if(winners.size() == 1) {
 				GamePanel.displayText("And the winner is:\n" + teamSel.getName(), teamSel.getColor());
 			} else {
@@ -260,6 +253,7 @@ public class KeyListen {
 				green = green / winners.size();
 				blue = blue / winners.size();
 				GamePanel.displayText("And the winner is:\n" + out, new Color(0xfe, 0x67, 0x00));
+				mode = Mode.SCORE;
 			}
 		}
 	}
@@ -300,7 +294,7 @@ public class KeyListen {
 		ch = false;
 		
 		// display question screen
-		if(catSel != -1 && ptSel != -1 && hasSelCat == false) {
+		if(catSel != -1 && ptSel != -1 && hasSelCat == false && mode == Mode.RUN) {
 			if(cat.get(catSel).getQuestion(ptSel).isUsed() == false) {
 				ques = cat.get(catSel).getQuestion(ptSel).getQuestion();
 				GamePanel.displayText(ques);
@@ -361,6 +355,7 @@ public class KeyListen {
 	
 	private static void moveOn() {
 		isDone = false;
+		System.out.println(round);
 		switch(round) {
 		case 0: {
 			canAns = false;
@@ -389,4 +384,8 @@ public class KeyListen {
 	public static void buzzYellow() { teamSel = teamYellow; doer(); }
 	public static void buzzGreen() { teamSel = teamGreen; doer(); }
 	public static void buzzBlue() { teamSel = teamBlue; doer(); }
+	
+	public static void setMode(Mode m) {
+		mode = m;
+	}
 }
