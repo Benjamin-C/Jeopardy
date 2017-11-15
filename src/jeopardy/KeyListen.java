@@ -117,6 +117,13 @@ public class KeyListen {
 				}
 			}
 		} break;
+		case KeyEvent.VK_CLOSE_BRACKET: {
+			if(teamAns != null && canAns == false) {
+				GamePanel.displayText(ques);
+				canAns = true;
+				teamAns.setGuessed(true);
+			}
+		} break;
 		
 		// select team
 		case KeyEvent.VK_F1: {teamMod = teamRed;} break;

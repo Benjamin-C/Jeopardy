@@ -45,7 +45,7 @@ public class Main{
 	
 	public static void beginRoundOne() {
 		List<Category> roundOne = new ArrayList<Category>();
-		String names[] = {"cooking", "fire", "firstaid", "knives", "scoutstuff", "water"};
+		String names[] = {"cooking", "doit", "flag", "hiking", "lashings", "lifeordeath"};
 		for(int i = 0; i < names.length; i++) {
 			Category temp = new Category("");
 			temp.parse(new File("catagories/" + names[i] + ".jep"), 200);
@@ -57,7 +57,7 @@ public class Main{
 	}
 	public static void beginRoundTwo() {
 		List<Category> roundTwo = new ArrayList<Category>();
-		String namesTwo[] = {"fire", "water", "knives", "cooking", "firstaid", "scoutstuff"};
+		String namesTwo[] = {"fire", "firstaid", "knives", "knots", "scoutstuff", "water"};
 		for(int i = 0; i < namesTwo.length; i++) {
 			Category temp = new Category("");
 			temp.parse(new File("catagories/" + namesTwo[i] + ".jep"), 400);
