@@ -20,6 +20,7 @@ public class Serial implements SerialPortEventListener {
                         "/dev/ttyACM0", // Raspberry Pi
 			"/dev/ttyUSB0", // Linux
 			"COM7", // Windows
+			"COM5", // Windows
 	};
 	/**
 	* A BufferedReader which will be fed by a InputStreamReader 
