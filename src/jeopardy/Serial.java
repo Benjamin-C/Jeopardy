@@ -19,7 +19,7 @@ public class Serial implements SerialPortEventListener {
 			"/dev/tty.usbserial-A9007UX1", // Mac OS X
                         "/dev/ttyACM0", // Raspberry Pi
 			"/dev/ttyUSB0", // Linux
-			"COM7", // Windows
+			"COM7","COM5","COM4" // Windows
 	};
 	/**
 	* A BufferedReader which will be fed by a InputStreamReader 
@@ -33,7 +33,7 @@ public class Serial implements SerialPortEventListener {
 	/** Milliseconds to block while waiting for port open */
 	private static final int TIME_OUT = 2000;
 	/** Default bits per second for COM port. */
-	private static final int DATA_RATE = 115200;
+	private static final int DATA_RATE = 250000;
 
 	public void initialize() {
                 // the next line is for Raspberry Pi and 
