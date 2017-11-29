@@ -16,10 +16,13 @@ public class Serial implements SerialPortEventListener {
 	int a = 0;
         /** The port we're normally going to use. */
 	private static final String PORT_NAMES[] = { 
+			/// what is this? =======
+			/// what is this? <<<<<<< HEAD
+			/// what is this? >>>>>>> branch 'master' of https://github.com/Benjamin-C/Jeopardy
 			"/dev/tty.usbserial-A9007UX1", // Mac OS X
-                        "/dev/ttyACM0", // Raspberry Pi
+            "/dev/ttyACM0", // Raspberry Pi
 			"/dev/ttyUSB0", // Linux
-			"COM7","COM5","COM4" // Windows
+			"COM7","COM5","COM4", // Windows
 	};
 	/**
 	* A BufferedReader which will be fed by a InputStreamReader 
