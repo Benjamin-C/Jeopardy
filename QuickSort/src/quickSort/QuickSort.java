@@ -44,8 +44,8 @@ public class QuickSort {
 					h.add(o.get(i));
 				}
 			}
-			System.out.println(sortp(l));
-			System.out.println(sortp(h));
+			sortp(l);
+			sortp(h);
 			//h = sort(h);
 		}
 		
@@ -55,14 +55,15 @@ public class QuickSort {
 		return out;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static ArrayList<Integer> sortp(ArrayList<Integer> o) {
 		ArrayList<Integer> l = new ArrayList<Integer>();
 		ArrayList<Integer> h = new ArrayList<Integer>();
-		ArrayList<Integer> out = new ArrayList<Integer>();
+		ArrayList<Integer> out = (ArrayList<Integer>) o.clone();
 		
 		if(o.size() > 1) {
 			int pivot = o.size() / 2;
-			System.out.println(o.get(pivot));
+			System.out.println("p" + o.get(pivot));
 			for(int i = 0; i < o.size(); i++) {
 				if(o.get(i) < o.get(pivot)) {
 					l.add(o.get(i));
@@ -70,11 +71,19 @@ public class QuickSort {
 					h.add(o.get(i));
 				}
 			}
+			System.out.println(l);
+			System.out.println(h);
+			if(l.size() > 1) {
+				l = sortp(l);
+			}
+			if(h.size() > 1) {
+				h = sortp(h);
+			}
+			
+			out = (ArrayList<Integer>) l.clone();
+			out.addAll(h);
 		}
-		
-		out = l;
-		out.addAll(h);
-		
+
 		return out;
 	}
 }
