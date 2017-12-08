@@ -23,4 +23,8 @@ public class Sortable {
 		i = index;
 	}
 	
+	@Override
+	public String toString() {
+		return o.toString();
+	}
 }

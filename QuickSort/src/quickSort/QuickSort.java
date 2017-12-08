@@ -4,57 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class QuickSort {
-	public static void main(String args[]) {
-		ArrayList<Sortable> list = new ArrayList<Sortable>();
-		Random r = new Random();
-		int width = 16;
-		
-		for(int i = 0; i < 32; i++) {
-			int n = r.nextInt(89) + 10;
-			list.add(new Sortable(n, n));
-		}
-		
-		System.out.print("<-- Begin List -->" + list.size());
-		for(int i = 0; i < list.size(); i++) {
-			if(i % width == 0) {
-				System.out.println();
-			} else {
-				System.out.print(", ");
-			}
-			System.out.print(list.get(i));
-		}
-		System.out.println();
-		System.out.println("<-- End List -->");
-		
-		list = sort(list);
-		
-		System.out.print("<-- Begin List -->" + list.size());
-		for(int i = 0; i < list.size(); i++) {
-			if(i % width == 0) {
-				System.out.println();
-			} else {
-				System.out.print(", ");
-			}
-			System.out.print(list.get(i));
-		}
-		System.out.println();
-		System.out.println("<-- End List -->");
-	}
 
-	public static ArrayList<Sortable> toSortable(ArrayList<Integer> o) {
-		ArrayList<Sortable> out = new ArrayList<Sortable>();
-		for(int i = 0; i < o.size(); i++) {
-			out.add(new Sortable(o.get(i), o.get(i)));
-		}
-		return out;
-	}
-	public static ArrayList<Integer> toInteger(ArrayList<Sortable> o) {
-		ArrayList<Integer> out = new ArrayList<Integer>();
-		for(int i = 0; i < o.size(); i++) {
-			out.add((Integer) o.get(i).getObject());
-		}
-		return out;
-	}
 	
 	@SuppressWarnings("unchecked")
 	public static ArrayList<Sortable> sort(ArrayList<Sortable> o) {
@@ -87,27 +37,16 @@ public class QuickSort {
 			
 		} else {
 			if(o.size() == 2) {
-				int a = Math.min(o.get(0).getIndex(), o.get(1).getIndex());
-				int b = Math.max(o.get(0).getIndex(), o.get(1).getIndex());
-				out.add(new Sortable(a, a));
-				out.add(new Sortable(b, b));
-			} else {
-				out = (ArrayList<Sortable>) o.clone();
-			}
-			/*
-			if(o.size() == 2) {
-				if(o.get(0).getIndex() > o.get(1).getIndex()) {
+				if(o.get(1).getIndex() < o.get(0).getIndex()) {
 					out.add(o.get(1));
 					out.add(o.get(0));
 				} else {
-					if(o.get(0).getIndex() > o.get(1).getIndex()) {
-						out.add(o.get(1));
-						out.add(o.get(0));
-					}
+					out = (ArrayList<Sortable>) o.clone();
 				}
+
 			} else {
 				out = (ArrayList<Sortable>) o.clone();
-			}*/
+			}
 		}
 		return out;
 	}
