@@ -12,8 +12,8 @@ public class Main {
 		long e = 0;
 		long t = 0;
 		long quickTime = 0;
-		int count = Calib.calibrate(32);
-		for(int i = 0; i < count; i++) {
+		//int count = Calib.calibrate(32);
+		for(int i = 0; i < 4096; i++) {
 			int n = r.nextInt(89) + 10;
 			list.add(new Sortable(n, n));
 		}
