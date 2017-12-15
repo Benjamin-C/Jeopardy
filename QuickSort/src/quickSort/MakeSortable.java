@@ -14,7 +14,7 @@ public class MakeSortable {
 			loc = 0;
 			for(int j = 0; j < s.get(i).length(); j++) {
 				char c = s.get(i).charAt(j);
-				loc = loc + (c * Math.pow(10, ((max - j - 1) * 2)));
+				loc = loc + (c * Math.pow(10, ((max - j - 1) * 3)));
 			}
 			out.add(new Sortable(s.get(i), loc));
 		}
