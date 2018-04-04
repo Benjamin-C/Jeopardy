@@ -6,39 +6,58 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class KeyListen {
-	public static boolean isDone;
+	private boolean isDone;
 	
-	//private static int team = -1;
-	private static int num = 0;
-	private static int numMult = 1;
-	private static int wrong = 0;
-	private static int mayLeave = 0;
-	private static boolean numberChanged = false;
-	private static boolean canAns = false;
-	private static Team teamSel = null;
-	private static Team teamAns = null;
-	private static Team teamMod = null;
-	private static Team teamRed = new Team(Color.RED, "Red");
-	private static Team teamYellow = new Team(Color.YELLOW, "Yellow");
-	private static Team teamGreen = new Team(Color.GREEN, "Green");
-	private static Team teamBlue = new Team(Color.CYAN, "Blue");
-	private static Mode mode = Mode.INIT;
-	private static List<Category> cat;
-	private static List<Team> winners = new ArrayList<Team>();
-	private static Category selCat;
-	private static Question selQues;
-	private static GameType round = GameType.NORMAL;
+	//private int team = -1;
+	private int num = 0;
+	private int numMult = 1;
+	private int wrong = 0;
+	private int mayLeave = 0;
+	private boolean numberChanged = false;
+	private boolean canAns = false;
+	private Team teamSel = null;
+	private Team teamAns = null;
+	private Team teamMod = null;
+	private Team teamRed = new Team(Color.RED, "Red");
+	private Team teamYellow = new Team(Color.YELLOW, "Yellow");
+	private Team teamGreen = new Team(Color.GREEN, "Green");
+	private Team teamBlue = new Team(Color.CYAN, "Blue");
+	private Mode mode = Mode.INIT;
+	private List<Category> cat;
+	private List<Team> winners = new ArrayList<Team>();
+	private Category selCat;
+	private Question selQues;
+	private GameType round = GameType.NORMAL;
+	private GamePanel gamePanel;
+	private Game game;
 	
-	public static void init() {
-		GamePanel.setTeams(teamRed, teamYellow, teamGreen, teamBlue);
+	public KeyListen(GamePanel gp, Game g) {
+		num = 0;
+		numMult = 1;
+		wrong = 0;
+		mayLeave = 0;
+		numberChanged = false;
+		canAns = false;
+		teamSel = null;
+		teamAns = null;
+		teamMod = null;
+		teamRed = new Team(Color.RED, "Red");
+		teamYellow = new Team(Color.YELLOW, "Yellow");
+		teamGreen = new Team(Color.GREEN, "Green");
+		teamBlue = new Team(Color.CYAN, "Blue");
+		mode = Mode.INIT;
+		winners = new ArrayList<Team>();
+		round = GameType.NORMAL;
+		gamePanel = gp;
+		game = g;
 	}
 	
-	public static void keyTyped(KeyEvent e) {}
+	public void keyTyped(KeyEvent e) {}
 	
-	public static void keyReleased(KeyEvent e) {}
+	public void keyReleased(KeyEvent e) {}
 	
 	@SuppressWarnings("incomplete-switch")
-	public static void keyPressed(KeyEvent e) {
+	public void keyPressed(KeyEvent e) {
 		switch(e.getKeyCode()) {
 		// Select category
 		case KeyEvent.VK_Q: selCat = cat.get(0); break;
@@ -69,7 +88,7 @@ public class KeyListen {
 		case KeyEvent.VK_SUBTRACT: numMult = numMult * -1; numberChanged = true; break;
 		
 		// cancel question selection
-		case KeyEvent.VK_ESCAPE: if(selQues != null) {selQues.setIsUsed(false);GamePanel.drawMainPanel(cat);exit();} break;
+		case KeyEvent.VK_ESCAPE: if(selQues != null) {selQues.setIsUsed(false);gamePanel.drawMainPanel(cat);exit();} break;
 		
 		// Happens when a team buzzes in
 		case KeyEvent.VK_F5: {teamSel = teamRed;} break;
@@ -81,13 +100,13 @@ public class KeyListen {
 		// Correct answer
 		case KeyEvent.VK_BACK_SPACE: {
 			if(mode == Mode.FINAL_CORRECT) {teamSel.addScore(teamSel.getWager()); finalSwitch();}
-			else {if(teamAns != null) {GamePanel.displayText(selQues.getAnswer()); teamAns.addScore(selQues.getScore()); mayLeave = 1;}}
+			else {if(teamAns != null) {gamePanel.displayText(selQues.getAnswer()); teamAns.addScore(selQues.getScore()); mayLeave = 1;}}
 		} break;
 		// Wrong answer
 		case KeyEvent.VK_BACK_SLASH: {
 			if(mode == Mode.FINAL_CORRECT) {teamSel.addScore(teamSel.getWager() * -1); finalSwitch();}
 			else {if(teamAns != null && canAns == false) {
-					GamePanel.displayText(selQues.getQuestion());
+					gamePanel.displayText(selQues.getQuestion());
 					canAns = true;
 					teamAns.setGuessed(true);
 					teamAns.addScore(selQues.getScore() * -1);
@@ -97,7 +116,7 @@ public class KeyListen {
 		} break;
 		case KeyEvent.VK_CLOSE_BRACKET: {
 			if(teamAns != null && canAns == false) {
-				GamePanel.displayText(selQues.getQuestion());
+				gamePanel.displayText(selQues.getQuestion());
 				canAns = true;
 				teamAns.setGuessed(true);
 			}
@@ -128,20 +147,20 @@ public class KeyListen {
 				System.out.println(mode);
 				switch(mode) {
 				case RUN: {} break;
-				case SCORE_ADD: teamMod.addScore(num * numMult); GamePanel.drawMainPanel(cat); break;
-				case SCORE_SET: teamMod.setScore(num * numMult); GamePanel.drawMainPanel(cat); break;
+				case SCORE_ADD: teamMod.addScore(num * numMult); gamePanel.drawMainPanel(cat); break;
+				case SCORE_SET: teamMod.setScore(num * numMult); gamePanel.drawMainPanel(cat); break;
 				case WAGER: {
 					teamSel.setWager(num * numMult);
 					switch(teamSel.getName()) {
 					case "Red": { teamSel = teamYellow; } break;
 					case "Yellow": { teamSel = teamGreen; } break;
 					case "Green": { teamSel = teamBlue; } break;
-					case "Blue": { System.out.println(GamePanel.displayText(cat.get(0).getQuestion(0).getQuestion() + "")); mode = Mode.FINAL_JEOPARDY; System.out.println("Blue Team");} break;
+					case "Blue": { System.out.println(gamePanel.displayText(cat.get(0).getQuestion(0).getQuestion() + "")); mode = Mode.FINAL_JEOPARDY; System.out.println("Blue Team");} break;
 					}
 					num = 0;
 					numMult = 1;
 					if(mode != Mode.FINAL_JEOPARDY) {
-						GamePanel.displayText(teamSel.getName() + " Team\n");
+						gamePanel.displayText(teamSel.getName() + " Team\n");
 					}
 				} break;
 				default: {} break;
@@ -156,11 +175,11 @@ public class KeyListen {
 						num = 0;
 						numMult = 1;
 						teamSel = teamRed;
-						GamePanel.displayText(teamSel.getName() + " Team\n");
+						gamePanel.displayText(teamSel.getName() + " Team\n");
 					} break;
 					default: {
 						if(mayLeave == 1) {
-							GamePanel.drawMainPanel(cat);
+							gamePanel.drawMainPanel(cat);
 							exit();
 							mayLeave = 0;
 						}
@@ -171,10 +190,10 @@ public class KeyListen {
 					System.out.println(mode);
 					mode = Mode.FINAL_CORRECT;
 					teamSel = teamRed;
-					GamePanel.displayText(cat.get(0).getQuestion(0).getAnswer(), teamSel.getColor());
+					gamePanel.displayText(cat.get(0).getQuestion(0).getAnswer(), teamSel.getColor());
 				} break;
 				case SCORE: {
-					GamePanel.showScores();
+					gamePanel.showScores();
 				}
 				}
 			}
@@ -187,18 +206,18 @@ public class KeyListen {
 		doer();
 	}
 	
-	private static void doer() {
+	private void doer() {
 		// Begin doers
 		
 		// Show color if round is 0
 		if(round == GameType.NORMAL && teamSel != null) {
-			GamePanel.displayText("Jeopardy", teamSel.getColor());
+			gamePanel.displayText("Jeopardy", teamSel.getColor());
 			teamSel = null;
 		}
 		
 		// Handle teams buzzing in
 		if(teamSel != null && canAns == true && teamSel.hasGuessed() == false) {
-			GamePanel.displayText(selQues.getQuestion(), teamSel.getColor());
+			gamePanel.displayText(selQues.getQuestion(), teamSel.getColor());
 			canAns = false;
 			teamAns = teamSel;
 			teamSel = null;
@@ -206,7 +225,7 @@ public class KeyListen {
 		
 		// End if everyone has guessed wrong
 		if(wrong >= 4) {
-			GamePanel.displayText(selQues.getAnswer());
+			gamePanel.displayText(selQues.getAnswer());
 			mayLeave = 1;
 			exit();
 		}
@@ -217,7 +236,7 @@ public class KeyListen {
 			int numb = num * numMult;
 			System.out.println(numb);
 			if(mode == Mode.WAGER) {
-				GamePanel.displayText(teamSel.getName() + " Team\n" + numb);
+				gamePanel.displayText(teamSel.getName() + " Team\n" + numb);
 			}
 		}
 		numberChanged = false;
@@ -225,18 +244,18 @@ public class KeyListen {
 		// display question screen
 		if(selQues != null && mode == Mode.RUN) {
 			if(selQues.isUsed() == false) {
-				GamePanel.displayText(selQues.getQuestion());
+				gamePanel.displayText(selQues.getQuestion());
 				selQues.setIsUsed(true);
 				canAns = true;
 			}
 		}	
 	}
 
-	public static void setQuestions(List<Category> c) {
+	public void setQuestions(List<Category> c) {
 		cat = c;
 	}
 	
-	private static void exit() {
+	private void exit() {
 		teamRed.setGuessed(false);
 		teamYellow.setGuessed(false);
 		teamGreen.setGuessed(false);
@@ -246,7 +265,7 @@ public class KeyListen {
 		canAns = false;
 	}
 	
-	private static void exit(boolean noCheck) {
+	private void exit(boolean noCheck) {
 		exit();
 		if(noCheck == false) {
 			isDone = true;
@@ -262,42 +281,42 @@ public class KeyListen {
 		}
 	}
 	
-	private static void moveOn() {
+	private void moveOn() {
 		isDone = false;
 		System.out.println(round);
 		switch(round) {
 		case NORMAL: {
 			canAns = false;
-			Main.beginRoundOne();
+			game.beginRoundOne();
 			round = GameType.DOUBLE;
 			exit(true);
 		} break;
 		case DOUBLE: {
-			Main.beginRoundTwo();
+			game.beginRoundTwo();
 			round = GameType.FINAL;
 			exit(true);
 		} break;
 		case FINAL: {
-			Main.beginRoundThree();
+			game.beginRoundThree();
 			exit(true);
 		} break;
 		}
 	}
 	
-	public static void canAns(boolean c) {
+	private void canAns(boolean c) {
 		canAns = c;
 	}
 	
-	public static void buzzRed() { teamSel = teamRed; doer(); }
-	public static void buzzYellow() { teamSel = teamYellow; doer(); }
-	public static void buzzGreen() { teamSel = teamGreen; doer(); }
-	public static void buzzBlue() { teamSel = teamBlue; doer(); }
+	public void buzzRed() { teamSel = teamRed; doer(); }
+	public void buzzYellow() { teamSel = teamYellow; doer(); }
+	public void buzzGreen() { teamSel = teamGreen; doer(); }
+	public void buzzBlue() { teamSel = teamBlue; doer(); }
 	
-	public static void setMode(Mode m) {
+	public void setMode(Mode m) {
 		mode = m;
 	}
 	
-	private static void finalSwitch() {
+	private void finalSwitch() {
 		switch(teamSel.getName()) {
 		case "Red": { teamSel = teamYellow; } break;
 		case "Yellow": { teamSel = teamGreen; } break;
@@ -305,7 +324,7 @@ public class KeyListen {
 		case "Blue": { mode = Mode.RESULTS; } break;
 		}
 		if(mode != Mode.RESULTS) {
-			GamePanel.displayText(cat.get(0).getQuestion(0).getAnswer(), teamSel.getColor());
+			gamePanel.displayText(cat.get(0).getQuestion(0).getAnswer(), teamSel.getColor());
 		} else { // TODO make this take less lines, mabe use math.max
 			if(teamRed.getScore() > teamYellow.getScore()) {teamSel = teamRed;} else {teamSel = teamYellow;}
 			if(teamSel.getScore() < teamGreen.getScore()) {teamSel = teamGreen;}
@@ -315,7 +334,7 @@ public class KeyListen {
 			if(teamGreen.getScore() == teamSel.getScore()) {winners.add(teamGreen);}
 			if(teamBlue.getScore() == teamSel.getScore()) {winners.add(teamBlue);}
 			if(winners.size() == 1) {
-				GamePanel.displayText("And the winner is:\n" + teamSel.getName(), teamSel.getColor());
+				gamePanel.displayText("And the winner is:\n" + teamSel.getName(), teamSel.getColor());
 			} else {
 				String out = "";
 				int red = 0;
@@ -333,7 +352,7 @@ public class KeyListen {
 				red = red / winners.size();
 				green = green / winners.size();
 				blue = blue / winners.size();
-				GamePanel.displayText("And the winner is:\n" + out, new Color(0xfe, 0x67, 0x00));
+				gamePanel.displayText("And the winner is:\n" + out, new Color(0xfe, 0x67, 0x00));
 				mode = Mode.SCORE;
 			}
 		}

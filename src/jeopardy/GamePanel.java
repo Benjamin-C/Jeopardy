@@ -5,36 +5,51 @@ package jeopardy;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.List;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class GamePanel{
 	
-	private static JFrame jf;
-	private static JPanel panel;
-	
-	private static Team teamRed;
-	private static Team teamYellow;
-	private static Team teamGreen;
-	private static Team teamBlue;
-	
-	private static int width;
-	private static int height;
-	
-	public static void setGamePanel(JFrame j) {
+	public GamePanel(JFrame j, KeyListen kl, Team red, Team yellow, Team green, Team blue) {
 		jf = j;
-	}
-	
-	public static void setTeams(Team red, Team yellow, Team green, Team blue) {
 		teamRed = red;
 		teamYellow = yellow;
 		teamGreen = green;
 		teamBlue = blue;
+		jf.setTitle("Jeopardy");
+		jf.setSize(1280, 720);
+		jf.setVisible(true);
+		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		ImageIcon img = new ImageIcon("icon.png");
+		jf.setIconImage(img.getImage());
+		jf.addKeyListener(new KeyListener() {
+			@Override public void keyTyped(KeyEvent e) {kl.keyTyped(e);}
+			@Override public void keyReleased(KeyEvent e) {kl.keyReleased(e);}
+			@Override public void keyPressed(KeyEvent e) {kl.keyPressed(e);}
+		});
 	}
 	
-	public static boolean drawMainPanel(List<Category> cat) {
+	private JFrame jf;
+	private JPanel panel;
+	
+	private Team teamRed;
+	private Team teamYellow;
+	private Team teamGreen;
+	private Team teamBlue;
+	
+	private int width;
+	private int height;
+	
+	public void setTeams() {
+		
+	}
+	
+	public boolean drawMainPanel(List<Category> cat) {
 		panel = new JPanel() {
 			@Override
             public void paintComponent(Graphics g) {
@@ -86,7 +101,7 @@ public class GamePanel{
         return true;
 	}
 	
-	private static void drawScore(Graphics g, Team t, JPanel p, int w, int j) {
+	private void drawScore(Graphics g, Team t, JPanel p, int w, int j) {
 		int bw = p.getWidth() / 7;
         int bh = p.getHeight() / 6;
         String text = t.getName();
@@ -103,11 +118,11 @@ public class GamePanel{
         g.drawString(text,  x,  y);
 	}
 	
-	public static boolean displayText(String text) {
+	public boolean displayText(String text) {
 		return displayText(text, Color.BLUE);
 	}
 	
-	public static boolean displayText(String text, Color c) {
+	public boolean displayText(String text, Color c) {
 		if(text.equals(null)) {
 			return false;
 		}
@@ -178,7 +193,7 @@ public class GamePanel{
         return true;
 	}
 	
-	public static boolean showScores() {
+	public boolean showScores() {
 		panel = new JPanel() {
         	@Override
             public void paintComponent(Graphics g) {
@@ -199,7 +214,7 @@ public class GamePanel{
 		return true;
 	}
 	
-	private static void displayScores(Team team, int cx, int ch, Graphics g) {
+	private void displayScores(Team team, int cx, int ch, Graphics g) {
         int sw;
         int sh = g.getFontMetrics().getHeight();
         int x;
