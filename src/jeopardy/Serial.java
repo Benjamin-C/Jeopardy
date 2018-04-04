@@ -103,10 +103,11 @@ public class Serial implements SerialPortEventListener {
 			try {
 				String inputLine = input.readLine();
 				switch(inputLine) {
-				case "9": {KeyListen.buzzRed();} break;
-				case "a": {KeyListen.buzzYellow();} break;
-				case "b": {KeyListen.buzzGreen();} break;
-				case "c": {KeyListen.buzzBlue();} break;
+				//TODO fix
+				//case "9": {KeyListen.buzzRed();} break;
+				//case "a": {KeyListen.buzzYellow();} break;
+				//case "b": {KeyListen.buzzGreen();} break;
+				//case "c": {KeyListen.buzzBlue();} break;
 				}
 				//System.out.println(inputLine);
 			} catch (Exception e) {

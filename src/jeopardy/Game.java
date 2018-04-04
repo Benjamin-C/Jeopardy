@@ -1,6 +1,8 @@
 package jeopardy;
 
 import java.awt.Color;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,16 +24,15 @@ public class Game {
 		teamGreen = new Team(Color.GREEN, "Green");
 		teamBlue = new Team(Color.CYAN, "Blue");
 		jf = new JFrame();
+		
+		gamePanel = new GamePanel(jf, teamRed, teamYellow, teamGreen, teamBlue);
 		keyListen = new KeyListen(gamePanel, this);
 		
-		gamePanel = new GamePanel(jf, keyListen, teamRed, teamYellow, teamGreen, teamBlue);
-		
-		// Setup input modes
-		switch(mode) {
-		case "KEYBOARD": { } break;
-		case "EXTERNAL": {try { Serial.begin(); } catch (Exception e1) { e1.printStackTrace(); } } break;
-		case "APP": { System.out.println("This mode is currently not supported. Please select another mode then try again"); System.exit(1);} break;
-		}
+		jf.addKeyListener(new KeyListener() {
+			@Override public void keyTyped(KeyEvent e) {keyListen.keyTyped(e);}
+			@Override public void keyReleased(KeyEvent e) {keyListen.keyReleased(e);}
+			@Override public void keyPressed(KeyEvent e) {keyListen.keyPressed(e);}
+		});
 		
 		// Null Category
 		List<Category> nullCatList = new ArrayList<Category>();
@@ -39,8 +40,32 @@ public class Game {
 		nullCat.add(new Question("null", "null"));
 		nullCatList.add(nullCat);
 		keyListen.setQuestions(nullCatList);
+				
+		// Setup input modes
+		switch(mode) {
+		case "KEYBOARD": { } break;
+		case "EXTERNAL": {try { Serial.begin(); } catch (Exception e1) { e1.printStackTrace(); } } break;
+		case "APP": { System.out.println("This mode is currently not supported. Please select another mode then try again"); System.exit(1);} break;
+		}
 		
+		
+	}
+	
+	public void begin() {
 		gamePanel.displayText("Jeopardy");
+		keyListen.enable();
+		Thread t = new Thread() {
+			Object sync = new Object();
+			public void run() {
+				keyListen.setMode(Mode.INIT);
+				keyListen.setSyncObject(sync);
+				Util.pause(sync);
+				System.out.println("I think now is a good time to ...");
+				beginRoundOne();
+				Util.pause(sync);
+			}
+		};
+		t.start();
 	}
 	
 	public void beginRoundOne() {

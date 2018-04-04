@@ -5,8 +5,6 @@ package jeopardy;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.List;
 
 import javax.swing.ImageIcon;
@@ -15,7 +13,7 @@ import javax.swing.JPanel;
 
 public class GamePanel{
 	
-	public GamePanel(JFrame j, KeyListen kl, Team red, Team yellow, Team green, Team blue) {
+	public GamePanel(JFrame j, Team red, Team yellow, Team green, Team blue) {
 		jf = j;
 		teamRed = red;
 		teamYellow = yellow;
@@ -27,11 +25,6 @@ public class GamePanel{
 		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		ImageIcon img = new ImageIcon("icon.png");
 		jf.setIconImage(img.getImage());
-		jf.addKeyListener(new KeyListener() {
-			@Override public void keyTyped(KeyEvent e) {kl.keyTyped(e);}
-			@Override public void keyReleased(KeyEvent e) {kl.keyReleased(e);}
-			@Override public void keyPressed(KeyEvent e) {kl.keyPressed(e);}
-		});
 	}
 	
 	private JFrame jf;
@@ -42,13 +35,11 @@ public class GamePanel{
 	private Team teamGreen;
 	private Team teamBlue;
 	
-	private int width;
-	private int height;
-	
 	public void setTeams() {
 		
 	}
 	
+	@SuppressWarnings("serial")
 	public boolean drawMainPanel(List<Category> cat) {
 		panel = new JPanel() {
 			@Override
@@ -122,6 +113,7 @@ public class GamePanel{
 		return displayText(text, Color.BLUE);
 	}
 	
+	@SuppressWarnings("serial")
 	public boolean displayText(String text, Color c) {
 		if(text.equals(null)) {
 			return false;
@@ -193,6 +185,7 @@ public class GamePanel{
         return true;
 	}
 	
+	@SuppressWarnings("serial")
 	public boolean showScores() {
 		panel = new JPanel() {
         	@Override
