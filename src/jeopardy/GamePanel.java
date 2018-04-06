@@ -12,31 +12,21 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class GamePanel{
+
+	private JFrame jf;
+	private JPanel panel;
 	
-	public GamePanel(JFrame j, Team red, Team yellow, Team green, Team blue) {
+	private List<Team> teams;
+	
+	public GamePanel(JFrame j, List<Team> teams) {
 		jf = j;
-		teamRed = red;
-		teamYellow = yellow;
-		teamGreen = green;
-		teamBlue = blue;
+		this.teams = teams;
 		jf.setTitle("Jeopardy");
 		jf.setSize(1280, 720);
 		jf.setVisible(true);
 		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		ImageIcon img = new ImageIcon("icon.png");
 		jf.setIconImage(img.getImage());
-	}
-	
-	private JFrame jf;
-	private JPanel panel;
-	
-	private Team teamRed;
-	private Team teamYellow;
-	private Team teamGreen;
-	private Team teamBlue;
-	
-	public void setTeams() {
-		
 	}
 	
 	@SuppressWarnings("serial")
@@ -81,10 +71,9 @@ public class GamePanel{
 	                	}
                 	}
                 }
-                drawScore(g, teamRed, this, cat.size(), 0);
-                drawScore(g, teamYellow, this, cat.size(), 1);
-                drawScore(g, teamGreen, this, cat.size(), 2);
-                drawScore(g, teamBlue, this, cat.size(), 3);
+                for(int i = 0; i < teams.size(); i++) {
+                	drawScore(g, teams.get(i), this, cat.size(), i);
+                }
             }
         };
         jf.add(panel);
@@ -196,10 +185,10 @@ public class GamePanel{
 				g.setFont(new Font(g.getFont().getName(), Font.PLAIN, 40));
 		        g.setColor(Color.BLACK);
 		        g.fillRect(0,  0,  getWidth(), getHeight());
-				displayScores(teamRed, x, y, g);
-				displayScores(teamYellow, x * 2, y, g);
-				displayScores(teamGreen, x, y * 2, g);
-				displayScores(teamBlue, x * 2, y * 2, g);
+				displayScores(teams.get(0), x, y, g);
+				displayScores(teams.get(1), x * 2, y, g);
+				displayScores(teams.get(2), x, y * 2, g);
+				displayScores(teams.get(3), x * 2, y * 2, g);
         	}
 		};
 		jf.add(panel);

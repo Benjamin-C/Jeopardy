@@ -10,23 +10,23 @@ import javax.swing.JFrame;
 
 public class Game {
 	private GamePanel gamePanel;
-	private Team teamRed;
-	private Team teamYellow;
-	private Team teamGreen;
-	private Team teamBlue;
+	private List<Team> teams;
 	private JFrame jf;
 	private KeyListen keyListen;
+	private Mode mode;
 	
-	public Game(String mode) {
+	public Game(String inputMode) {
 		// Init vars
-		teamRed = new Team(Color.RED, "Red");
-		teamYellow = new Team(Color.YELLOW, "Yellow");
-		teamGreen = new Team(Color.GREEN, "Green");
-		teamBlue = new Team(Color.CYAN, "Blue");
+		teams = new ArrayList<Team>();
+		teams.add(new Team(Color.RED, "Red"));
+		teams.add(new Team(Color.YELLOW, "Yellow"));
+		teams.add(new Team(Color.GREEN, "Green"));
+		teams.add(new Team(Color.CYAN, "Blue"));
 		jf = new JFrame();
+		mode = Mode.INIT;
 		
-		gamePanel = new GamePanel(jf, teamRed, teamYellow, teamGreen, teamBlue);
-		keyListen = new KeyListen(gamePanel, this);
+		gamePanel = new GamePanel(jf, teams);
+		keyListen = new KeyListen(gamePanel, this, teams);
 		
 		jf.addKeyListener(new KeyListener() {
 			@Override public void keyTyped(KeyEvent e) {keyListen.keyTyped(e);}
@@ -42,7 +42,7 @@ public class Game {
 		keyListen.setQuestions(nullCatList);
 				
 		// Setup input modes
-		switch(mode) {
+		switch(inputMode) {
 		case "KEYBOARD": { } break;
 		case "EXTERNAL": {try { Serial.begin(); } catch (Exception e1) { e1.printStackTrace(); } } break;
 		case "APP": { System.out.println("This mode is currently not supported. Please select another mode then try again"); System.exit(1);} break;
@@ -57,12 +57,13 @@ public class Game {
 		Thread t = new Thread() {
 			Object sync = new Object();
 			public void run() {
-				keyListen.setMode(Mode.INIT);
+				setMode(Mode.INIT);
 				keyListen.setSyncObject(sync);
-				Util.pause(sync);
-				System.out.println("I think now is a good time to ...");
+				Util.pause(sync); // Wait for boss to be ready
 				beginRoundOne();
-				Util.pause(sync);
+				Util.pause(sync); // Wait for round one to be done
+				beginRoundTwo();
+				Util.pause(sync); // wait for round two to be done
 			}
 		};
 		t.start();
@@ -70,7 +71,7 @@ public class Game {
 	
 	public void beginRoundOne() {
 		List<Category> roundOne = new ArrayList<Category>();
-		String names[] = {"cooking", "doit", "flag", "hiking", "lashings", "lifeordeath"};
+		String names[] = {"cooking", "doit", "flag", "hiking", "lashings", "lifeordeath"}; // Must have 6 cats with 5 q's each
 		for(int i = 0; i < names.length; i++) {
 			Category temp = new Category("");
 			temp.parse(new File("catagories/" + names[i] + ".jep"), 200);
@@ -78,8 +79,9 @@ public class Game {
 		}
 		keyListen.setQuestions(roundOne);
 		gamePanel.drawMainPanel(roundOne);
-		keyListen.setMode(Mode.RUN);
+		setMode(Mode.SELECT);
 	}
+	
 	public void beginRoundTwo() {
 		List<Category> roundTwo = new ArrayList<Category>();
 		String namesTwo[] = {"fire", "firstaid", "knives", "knots", "scoutstuff", "water"};
@@ -103,5 +105,13 @@ public class Game {
 			roundTwo.add(temp);
 		}
 		keyListen.setQuestions(roundTwo);
+	}
+	
+	public Mode getMode() {
+		return mode;
+	}
+	
+	public void setMode(Mode m) {
+		mode = m;
 	}
 }
