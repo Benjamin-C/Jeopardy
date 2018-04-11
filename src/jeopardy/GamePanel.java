@@ -28,7 +28,7 @@ public class GamePanel{
 		ImageIcon img = new ImageIcon("icon.png");
 		jf.setIconImage(img.getImage());
 	}
-	
+
 	@SuppressWarnings("serial")
 	public boolean drawMainPanel(List<Category> cat) {
 		panel = new JPanel() {
@@ -127,26 +127,27 @@ public class GamePanel{
                 String textA = "";
                 String textB = "";
                 boolean twoLine = false;
+                int loc = 0;
                 if(text.contains("\n")) {
-                	int loc = 0;
-                	while(text.charAt(loc) != '\n') {
-                		loc++;
-                	}
+                	loc = text.indexOf("\n");
                 	textA = text.substring(0,  loc++);
                 	textB = text.substring(loc, text.length());
                 	twoLine = true;
-                } else {
-	                if(sw > (double) getWidth() * (9d/10d)) {
-	                	int loc = text.length() / 2;
-	                	while(text.charAt(loc) != ' ') {
-	                		loc++;
-	                	}
-	                	textA = text.substring(0, loc++);
-	                	textB = text.substring(loc, text.length());
-	                	twoLine = true;
-	                }
+                } else if(text.contains("\\n")) {
+                	loc = text.indexOf("\\n");
+                	textA = text.substring(0,  loc++);
+                	textB = text.substring(++loc, text.length());
+                	twoLine = true;
+                } else if(sw > (double) getWidth() * (9d/10d)) {
+                	loc = text.length() / 2;
+                	while(text.charAt(loc) != ' ') {
+                		loc++;
+                	}
+                	textA = text.substring(0, loc++);
+                	textB = text.substring(loc, text.length());
+                	twoLine = true;
                 }
-                if(twoLine == true) {
+                if(twoLine) {
                 	sh = g.getFontMetrics().getHeight();
                 	
                 	sw = g.getFontMetrics().stringWidth(textA);

@@ -64,6 +64,8 @@ public class Game {
 				Util.pause(sync); // Wait for round one to be done
 				beginRoundTwo();
 				Util.pause(sync); // wait for round two to be done
+				System.out.println("Round 2 done");
+				System.exit(0);
 			}
 		};
 		t.start();
@@ -93,6 +95,7 @@ public class Game {
 		// System.out.println(roundTwo.toString());
 		gamePanel.drawMainPanel(roundTwo);
 		keyListen.setQuestions(roundTwo);
+		setMode(Mode.SELECT);
 	}
 	
 	public void beginRoundThree() {

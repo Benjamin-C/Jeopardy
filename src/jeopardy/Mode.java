@@ -6,10 +6,12 @@ public enum Mode {
 	BUZZ, // Wait for temas to buzz in
 	ANSWER, // Check for correct answer
 	SHOW_CORRECT, // Show the correct answer
-	SCORE_CHANGE,
+	SELECT_MOD_TEAM, // Select a team to modify
+	SCORE_CHANGE, // Change a team's score
 	WAGER,
 	FINAL_JEOPARDY,
 	FINAL_CORRECT,
 	RESULTS,
-	SCORE;
+	SCORE,
+	PICK_NUMBER;
 }

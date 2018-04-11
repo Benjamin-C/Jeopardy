@@ -22,7 +22,14 @@ public class KeyListen {
 	private Game game;
 	private boolean enabled;
 	private Object sync;
+	private Object numPickSync;
 	private Question selQues;
+	private Mode nextMode;
+	private boolean canceled;
+	private Runnable whenNumberSelectionDone;
+	private Runnable whenNumberSelectionCancel;
+	private boolean isNumberNegitive;
+	public boolean isModifyAdditive;
 	
 	public KeyListen(GamePanel gp, Game g, List<Team> team) {
 		num = 0;
@@ -36,6 +43,10 @@ public class KeyListen {
 		game = g;
 		enabled = false;
 		teams = team;
+		nextMode = Mode.SELECT;
+		canceled = false;
+		isNumberNegitive = false;
+		isModifyAdditive = false;
 	}
 	
 	public void setSyncObject(Object s) {
@@ -74,9 +85,13 @@ public class KeyListen {
 				
 				// Cancel selection
 				//case KeyEvent.VK_ESCAPE: if(selQues != null) {selQues.setIsUsed(false);gamePanel.drawMainPanel(cat);exit();} break;
-				
 				case KeyEvent.VK_M: { for(Category c : cat) { for(Question q : c.getQuestions()) { q.setIsUsed(true); } } cat.get(0).getQuestion(0).setIsUsed(false); gamePanel.drawMainPanel(cat);} break;
-				}
+				
+				// Set Team Score
+				case KeyEvent.VK_I: { isModifyAdditive = false; game.setMode(Mode.SELECT_MOD_TEAM); } break;
+				case KeyEvent.VK_K: { isModifyAdditive = true; game.setMode(Mode.SELECT_MOD_TEAM); } break;
+				
+				}	
 			} break; // End mode SELECT
 			case BUZZ: {
 				switch(key) {
@@ -138,7 +153,33 @@ public class KeyListen {
 				} break;
 				}
 			} break; // end mode SHOW_CORRECT
-			
+			case SELECT_MOD_TEAM: {
+				switch(key) {
+				case KeyEvent.VK_F1: {selectModTeam(teams.get(0));} break;
+				case KeyEvent.VK_F2: {selectModTeam(teams.get(1));} break;
+				case KeyEvent.VK_F3: {selectModTeam(teams.get(2));} break;
+				case KeyEvent.VK_F4: {selectModTeam(teams.get(3));} break;
+				}
+			} break;
+			case SCORE_CHANGE: {
+				
+				
+			} break;
+			case PICK_NUMBER: {
+				pickNumber(key);
+				switch(key) {
+				case KeyEvent.VK_ENTER: { if(e.getKeyLocation() == 4) {
+					if(isNumberNegitive) {
+						num = num * -1;
+					}
+					whenNumberSelectionDone.run();
+				} } break;
+				case KeyEvent.VK_ESCAPE: {
+					canceled = true;
+					whenNumberSelectionCancel.run();
+				}
+				}
+			}
 			
 			case FINAL_CORRECT:
 				break;
@@ -148,9 +189,6 @@ public class KeyListen {
 				break;
 			case SCORE:
 				break;
-			case SCORE_CHANGE: {
-				pickNumber(key);
-			} break;
 			case WAGER:
 				break;
 			default:
@@ -160,6 +198,14 @@ public class KeyListen {
 	}
 
 	// TODO update numbers
+	private void pickNumber(Runnable whenDone, Runnable whenCancel) {
+		whenNumberSelectionDone = whenDone;
+		whenNumberSelectionCancel = whenCancel;
+		isNumberNegitive = false;
+		System.out.println("Getting number");
+		game.setMode(Mode.PICK_NUMBER);
+		num = 0;
+	}
 	private void pickNumber(int key) {
 		switch(key) {
 		case KeyEvent.VK_NUMPAD0: selectNumber(0); break;
@@ -172,17 +218,34 @@ public class KeyListen {
 		case KeyEvent.VK_NUMPAD7: selectNumber(7); break;
 		case KeyEvent.VK_NUMPAD8: selectNumber(8); break;
 		case KeyEvent.VK_NUMPAD9: selectNumber(9); break;
-		case KeyEvent.VK_SUBTRACT: selectNumber(10); break;
+		case KeyEvent.VK_SUBTRACT: selectNumber(-1); break;
 		}
 	}
 	private void selectNumber(int d) {
-		num = (num * 10) + d;
-		int numb = num * numMult;
-		System.out.println(numb);
+		if(d == -1) {
+			isNumberNegitive = !isNumberNegitive;
+		} else {
+			num = (num * 10) + d;
+			System.out.println(num);
+		}
+		String n = "";
+		if(isNumberNegitive) {
+			n = "-";
+		}
+		System.out.println(n + num);
+		gamePanel.displayText(teamMod.getName() + ": \n" + n + num, teamMod.getColor());
 		if(game.getMode() == Mode.WAGER) {
-			gamePanel.displayText(teamSel.getName() + " Team\n" + numb);
+			gamePanel.displayText(teamSel.getName() + " Team\n" + num);
 		}
 	}
+	
+	private void selectModTeam(Team t) {
+		teamMod = t;
+		gamePanel.displayText(teamMod.getName() + ": \n", teamMod.getColor());
+		pickNumber( new Runnable() { @Override public void run() { if(isModifyAdditive) { t.setScore(t.getScore() + num);} else {t.setScore(num); } game.setMode(Mode.SELECT); gamePanel.drawMainPanel(cat); } },
+				new Runnable() {@Override public void run() { game.setMode(Mode.SELECT); gamePanel.drawMainPanel(cat);} });
+	}
+	
 	private void selectQuestion(Question q) { // Select the question
 		if(q.isUsed() == false) {
 			for(Team t : teams) {
@@ -212,7 +275,7 @@ public class KeyListen {
 	}
 	
 	private void moveOn() {
-		isDone = false;
+		//isDone = false;
 		System.out.println(round);
 		switch(round) {
 		case NORMAL: {
