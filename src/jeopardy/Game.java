@@ -6,6 +6,8 @@ import java.awt.event.KeyListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+
 import javax.swing.JFrame;
 
 public class Game {
@@ -14,6 +16,8 @@ public class Game {
 	private JFrame jf;
 	private KeyListen keyListen;
 	private Mode mode;
+	private int numDoubles = 2;
+	private ActionCenter actionCenter;
 	
 	public Game(String inputMode) {
 		// Init vars
@@ -26,7 +30,9 @@ public class Game {
 		mode = Mode.INIT;
 		
 		gamePanel = new GamePanel(jf, teams);
-		keyListen = new KeyListen(gamePanel, this, teams);
+		actionCenter = new ActionCenter(gamePanel, this, teams);
+		keyListen = new KeyListen(this, actionCenter);
+		
 		
 		jf.addKeyListener(new KeyListener() {
 			@Override public void keyTyped(KeyEvent e) {keyListen.keyTyped(e);}
@@ -39,7 +45,7 @@ public class Game {
 		Category nullCat = new Category("null");
 		nullCat.add(new Question("null", "null"));
 		nullCatList.add(nullCat);
-		keyListen.setQuestions(nullCatList);
+		actionCenter.setQuestions(nullCatList);
 				
 		// Setup input modes
 		switch(inputMode) {
@@ -58,11 +64,11 @@ public class Game {
 			Object sync = new Object();
 			public void run() {
 				setMode(Mode.INIT);
-				keyListen.setSyncObject(sync);
+				actionCenter.setSyncObject(sync);
 				Util.pause(sync); // Wait for boss to be ready
-				beginRoundOne();
+				beginNormalRound(new String[] {"cooking", "doit", "flag", "hiking", "lashings", "lifeordeath"});
 				Util.pause(sync); // Wait for round one to be done
-				beginRoundTwo();
+				beginNormalRound(new String[] {"fire", "firstaid", "knives", "knots", "scoutstuff", "water"});
 				Util.pause(sync); // wait for round two to be done
 				System.out.println("Round 2 done");
 				System.exit(0);
@@ -71,34 +77,29 @@ public class Game {
 		t.start();
 	}
 	
-	public void beginRoundOne() {
-		List<Category> roundOne = new ArrayList<Category>();
-		String names[] = {"cooking", "doit", "flag", "hiking", "lashings", "lifeordeath"}; // Must have 6 cats with 5 q's each
+	public void beginNormalRound(String[] names, int scoreMult) {
+		List<Category> cat = new ArrayList<Category>();
 		for(int i = 0; i < names.length; i++) {
 			Category temp = new Category("");
 			temp.parse(new File("catagories/" + names[i] + ".jep"), 200);
-			roundOne.add(temp);
+			cat.add(temp);
 		}
-		keyListen.setQuestions(roundOne);
-		gamePanel.drawMainPanel(roundOne);
+		Random r = new Random();
+		int doubles = 0;
+		while(doubles < numDoubles) {
+			Category c = cat.get(r.nextInt(cat.size()));
+			Question q = c.getQuestion(r.nextInt(c.size()));
+			if(!q.isDouble()) {
+				q.setDouble(true);
+				doubles++;
+				System.out.println("Added double");
+			}
+		}
+		gamePanel.drawMainPanel(cat);
+		actionCenter.setQuestions(cat);
 		setMode(Mode.SELECT);
 	}
-	
-	public void beginRoundTwo() {
-		List<Category> roundTwo = new ArrayList<Category>();
-		String namesTwo[] = {"fire", "firstaid", "knives", "knots", "scoutstuff", "water"};
-		for(int i = 0; i < namesTwo.length; i++) {
-			Category temp = new Category("");
-			temp.parse(new File("catagories/" + namesTwo[i] + ".jep"), 400);
-			roundTwo.add(temp);
-		}
-		// System.out.println(roundTwo.toString());
-		gamePanel.drawMainPanel(roundTwo);
-		keyListen.setQuestions(roundTwo);
-		setMode(Mode.SELECT);
-	}
-	
-	public void beginRoundThree() {
+	public void beginFinalRound() {
 		gamePanel.displayText("Final Jeopardy");
 		List<Category> roundTwo = new ArrayList<Category>();
 		String namesTwo[] = {"final"};
@@ -107,7 +108,7 @@ public class Game {
 			temp.parse(new File("catagories/" + namesTwo[i] + ".jep"), 400);
 			roundTwo.add(temp);
 		}
-		keyListen.setQuestions(roundTwo);
+		actionCenter.setQuestions(roundTwo);
 	}
 	
 	public Mode getMode() {

@@ -7,50 +7,20 @@ import java.util.List;
 
 public class KeyListen {
 	
-	//private int team = -1;
-	private int num;
-	private int numMult;
-	private Team teamSel;
-	private Team teamAns;
-	private Team teamMod;
-	private List<Team> teams;
-	private List<Category> cat;
-	private List<Team> winners;
-	private Category selCat;
-	private GameType round = GameType.NORMAL;
-	private GamePanel gamePanel;
+	private ActionCenter actionCenter;
 	private Game game;
 	private boolean enabled;
-	private Object sync;
-	private Object numPickSync;
-	private Question selQues;
-	private Mode nextMode;
-	private boolean canceled;
-	private Runnable whenNumberSelectionDone;
-	private Runnable whenNumberSelectionCancel;
-	private boolean isNumberNegitive;
-	public boolean isModifyAdditive;
 	
-	public KeyListen(GamePanel gp, Game g, List<Team> team) {
-		num = 0;
-		numMult = 1;
-		teamSel = null;
-		teamAns = null;
-		teamMod = null;
-		winners = new ArrayList<Team>();
-		round = GameType.NORMAL;
-		gamePanel = gp;
+	public KeyListen(Game g, ActionCenter ac) {
+		actionCenter = ac;
 		game = g;
-		enabled = false;
-		teams = team;
-		nextMode = Mode.SELECT;
-		canceled = false;
-		isNumberNegitive = false;
-		isModifyAdditive = false;
 	}
 	
-	public void setSyncObject(Object s) {
-		sync = s;
+	public void enable() {
+		enabled = true; // Allow use of the stuffs
+	}
+	public void disable() {
+		enabled = false; // Prevent use of the stuffs
 	}
 	
 	public void keyTyped(KeyEvent e) {}
@@ -63,102 +33,69 @@ public class KeyListen {
 			switch(game.getMode()) {
 			case INIT: {
 				if(e.getKeyCode() == KeyEvent.VK_ENTER && e.getKeyLocation() == 1) {
-					Util.resume(sync);
+					actionCenter.begin();
 				}
 			} break;
 			case SELECT: {
 				switch(key) {
 				// Select category
-				case KeyEvent.VK_Q: selCat = cat.get(0); break;
-				case KeyEvent.VK_W: selCat = cat.get(1); break;
-				case KeyEvent.VK_E: selCat = cat.get(2); break;
-				case KeyEvent.VK_R: selCat = cat.get(3); break;
-				case KeyEvent.VK_T: selCat = cat.get(4); break;
-				case KeyEvent.VK_Y: selCat = cat.get(5); break;
+				case KeyEvent.VK_Q: actionCenter.selectCategory(0); break;
+				case KeyEvent.VK_W: actionCenter.selectCategory(1); break;
+				case KeyEvent.VK_E: actionCenter.selectCategory(2); break;
+				case KeyEvent.VK_R: actionCenter.selectCategory(3); break;
+				case KeyEvent.VK_T: actionCenter.selectCategory(4); break;
+				case KeyEvent.VK_Y: actionCenter.selectCategory(5); break;
 		
 				// Select points
-				case KeyEvent.VK_A: if(selCat != null) { selectQuestion(selCat.getQuestion(0));} break;
-				case KeyEvent.VK_S: if(selCat != null) { selectQuestion(selCat.getQuestion(1));} break;
-				case KeyEvent.VK_D: if(selCat != null) { selectQuestion(selCat.getQuestion(2));} break;
-				case KeyEvent.VK_F: if(selCat != null) { selectQuestion(selCat.getQuestion(3));} break;
-				case KeyEvent.VK_G: if(selCat != null) { selectQuestion(selCat.getQuestion(4));} break;
+				case KeyEvent.VK_A: actionCenter.selectQuestion(0); break;
+				case KeyEvent.VK_S: actionCenter.selectQuestion(1); break;
+				case KeyEvent.VK_D: actionCenter.selectQuestion(2); break;
+				case KeyEvent.VK_F: actionCenter.selectQuestion(3); break;
+				case KeyEvent.VK_G: actionCenter.selectQuestion(4); break;
 				
 				// Cancel selection
 				//case KeyEvent.VK_ESCAPE: if(selQues != null) {selQues.setIsUsed(false);gamePanel.drawMainPanel(cat);exit();} break;
-				case KeyEvent.VK_M: { for(Category c : cat) { for(Question q : c.getQuestions()) { q.setIsUsed(true); } } cat.get(0).getQuestion(0).setIsUsed(false); gamePanel.drawMainPanel(cat);} break;
+				
+				// FastGame™
+				case KeyEvent.VK_M: actionCenter.fastGame(); break;
 				
 				// Set Team Score
-				case KeyEvent.VK_I: { isModifyAdditive = false; game.setMode(Mode.SELECT_MOD_TEAM); } break;
-				case KeyEvent.VK_K: { isModifyAdditive = true; game.setMode(Mode.SELECT_MOD_TEAM); } break;
+				case KeyEvent.VK_I: actionCenter.setTeamScore(); break;
+				case KeyEvent.VK_K: actionCenter.addToTeamScore(); break;
 				
+				// Cancel category selection
+				case KeyEvent.VK_ESCAPE: actionCenter.cancelCategorySelection(); break;
 				}	
 			} break; // End mode SELECT
 			case BUZZ: {
 				switch(key) {
 				// Happens when a team buzzes in
-				case KeyEvent.VK_F5: {setlectTeam(teams.get(0));} break;
-				case KeyEvent.VK_F6: {setlectTeam(teams.get(1));} break;
-				case KeyEvent.VK_F7: {setlectTeam(teams.get(2));} break;
-				case KeyEvent.VK_F8: {setlectTeam(teams.get(3));} break;
+				case KeyEvent.VK_F5: actionCenter.setlectTeam(0); break;
+				case KeyEvent.VK_F6: actionCenter.setlectTeam(1); break;
+				case KeyEvent.VK_F7: actionCenter.setlectTeam(2); break;
+				case KeyEvent.VK_F8: actionCenter.setlectTeam(3); break;
+				
+				//Cancel team selection
+				case KeyEvent.VK_ESCAPE: actionCenter.cancelTeamSelection(); break;
 				}
 			} break; // end mode BUZZ
 			case ANSWER: {
 				switch(key) {
-				case KeyEvent.VK_BACK_SPACE: {
-					gamePanel.displayText(selQues.getAnswer()); // Show answer
-					teamAns.addScore(selQues.getScore());
-					game.setMode(Mode.SHOW_CORRECT);
-				} break;
-				case KeyEvent.VK_BACK_SLASH: {
-					teamAns.setGuessed(true);
-					teamAns.addScore(selQues.getScore() * -1);
-					boolean done = true;
-					for(Team t : teams) {
-						if(!t.hasGuessed()) {
-							done = false;
-						}
-					}
-					if(done) {
-						gamePanel.displayText(selQues.getAnswer());
-						game.setMode(Mode.SHOW_CORRECT);
-					} else {
-						game.setMode(Mode.BUZZ);
-						gamePanel.displayText(selQues.getQuestion()); // Remove the team's color border form the screen
-					}
-				} break;
+				case KeyEvent.VK_BACK_SPACE: actionCenter.teamAnsworedCorrectly(); break;
+				case KeyEvent.VK_BACK_SLASH: actionCenter.teamAnsworedIncorrectly(); break;
 				}
 			} break; // end mode ANSWER
 			case SHOW_CORRECT: {
 				switch(key) {
-				case KeyEvent.VK_ENTER: {
-					if(e.getKeyLocation() == 1) {
-						
-						boolean done = true;
-						for(Category c : cat) {
-							for(Question q : c.getQuestions()) {
-								if(!q.isUsed()) {
-									done = false; // Set done to false if there is a question that is not done
-								}
-							}
-						}
-						if(done) {
-							Util.resume(sync);
-							System.out.println("Done with questions");
-						} else {
-							gamePanel.drawMainPanel(cat);
-							game.setMode(Mode.SELECT);
-						}
-					}
-					
-				} break;
+				case KeyEvent.VK_ENTER: if(e.getKeyLocation() == 1) { actionCenter.doneLookingAtAnswer();} break;
 				}
 			} break; // end mode SHOW_CORRECT
 			case SELECT_MOD_TEAM: {
 				switch(key) {
-				case KeyEvent.VK_F1: {selectModTeam(teams.get(0));} break;
-				case KeyEvent.VK_F2: {selectModTeam(teams.get(1));} break;
-				case KeyEvent.VK_F3: {selectModTeam(teams.get(2));} break;
-				case KeyEvent.VK_F4: {selectModTeam(teams.get(3));} break;
+				case KeyEvent.VK_F1: actionCenter.selectModTeam(0); break;
+				case KeyEvent.VK_F2: actionCenter.selectModTeam(1); break;
+				case KeyEvent.VK_F3: actionCenter.selectModTeam(2); break;
+				case KeyEvent.VK_F4: actionCenter.selectModTeam(3); break;
 				}
 			} break;
 			case SCORE_CHANGE: {
@@ -166,18 +103,20 @@ public class KeyListen {
 				
 			} break;
 			case PICK_NUMBER: {
-				pickNumber(key);
 				switch(key) {
-				case KeyEvent.VK_ENTER: { if(e.getKeyLocation() == 4) {
-					if(isNumberNegitive) {
-						num = num * -1;
-					}
-					whenNumberSelectionDone.run();
-				} } break;
-				case KeyEvent.VK_ESCAPE: {
-					canceled = true;
-					whenNumberSelectionCancel.run();
-				}
+				case KeyEvent.VK_NUMPAD0: actionCenter.selectNumber(0); break;
+				case KeyEvent.VK_NUMPAD1: actionCenter.selectNumber(1); break;
+				case KeyEvent.VK_NUMPAD2: actionCenter.selectNumber(2); break;
+				case KeyEvent.VK_NUMPAD3: actionCenter.selectNumber(3); break;
+				case KeyEvent.VK_NUMPAD4: actionCenter.selectNumber(4); break;
+				case KeyEvent.VK_NUMPAD5: actionCenter.selectNumber(5); break;
+				case KeyEvent.VK_NUMPAD6: actionCenter.selectNumber(6); break;
+				case KeyEvent.VK_NUMPAD7: actionCenter.selectNumber(7); break;
+				case KeyEvent.VK_NUMPAD8: actionCenter.selectNumber(8); break;
+				case KeyEvent.VK_NUMPAD9: actionCenter.selectNumber(9); break;
+				case KeyEvent.VK_SUBTRACT: actionCenter.selectNumber(-1); break;
+				case KeyEvent.VK_ENTER: if(e.getKeyLocation() == 4) { actionCenter.finializeNumberSelection();} break;
+				case KeyEvent.VK_ESCAPE: actionCenter.cancelNumberSelection(); break;
 				}
 			}
 			
@@ -193,151 +132,6 @@ public class KeyListen {
 				break;
 			default:
 				break;
-			}
-		}
-	}
-
-	// TODO update numbers
-	private void pickNumber(Runnable whenDone, Runnable whenCancel) {
-		whenNumberSelectionDone = whenDone;
-		whenNumberSelectionCancel = whenCancel;
-		isNumberNegitive = false;
-		System.out.println("Getting number");
-		game.setMode(Mode.PICK_NUMBER);
-		num = 0;
-	}
-	private void pickNumber(int key) {
-		switch(key) {
-		case KeyEvent.VK_NUMPAD0: selectNumber(0); break;
-		case KeyEvent.VK_NUMPAD1: selectNumber(1); break;
-		case KeyEvent.VK_NUMPAD2: selectNumber(2); break;
-		case KeyEvent.VK_NUMPAD3: selectNumber(3); break;
-		case KeyEvent.VK_NUMPAD4: selectNumber(4); break;
-		case KeyEvent.VK_NUMPAD5: selectNumber(5); break;
-		case KeyEvent.VK_NUMPAD6: selectNumber(6); break;
-		case KeyEvent.VK_NUMPAD7: selectNumber(7); break;
-		case KeyEvent.VK_NUMPAD8: selectNumber(8); break;
-		case KeyEvent.VK_NUMPAD9: selectNumber(9); break;
-		case KeyEvent.VK_SUBTRACT: selectNumber(-1); break;
-		}
-	}
-	private void selectNumber(int d) {
-		if(d == -1) {
-			isNumberNegitive = !isNumberNegitive;
-		} else {
-			num = (num * 10) + d;
-			System.out.println(num);
-		}
-		String n = "";
-		if(isNumberNegitive) {
-			n = "-";
-		}
-		System.out.println(n + num);
-		gamePanel.displayText(teamMod.getName() + ": \n" + n + num, teamMod.getColor());
-		if(game.getMode() == Mode.WAGER) {
-			gamePanel.displayText(teamSel.getName() + " Team\n" + num);
-		}
-	}
-	
-	private void selectModTeam(Team t) {
-		teamMod = t;
-		gamePanel.displayText(teamMod.getName() + ": \n", teamMod.getColor());
-		pickNumber( new Runnable() { @Override public void run() { if(isModifyAdditive) { t.setScore(t.getScore() + num);} else {t.setScore(num); } game.setMode(Mode.SELECT); gamePanel.drawMainPanel(cat); } },
-				new Runnable() {@Override public void run() { game.setMode(Mode.SELECT); gamePanel.drawMainPanel(cat);} });
-	}
-	
-	private void selectQuestion(Question q) { // Select the question
-		if(q.isUsed() == false) {
-			for(Team t : teams) {
-				t.setGuessed(false);
-			}
-			gamePanel.displayText(q.getQuestion());
-			q.setIsUsed(true);
-			selQues = q;
-			game.setMode(Mode.BUZZ);
-		}
-	}
-	private void setlectTeam(Team t) {
-		gamePanel.displayText(selQues.getQuestion(), t.getColor());
-		teamAns = t;
-		game.setMode(Mode.ANSWER);
-	}
-	
-	public void enable() {
-		enabled = true;
-	}
-	public void disable() {
-		enabled = false;
-	}
-	
-	public void setQuestions(List<Category> c) {
-		cat = c;
-	}
-	
-	private void moveOn() {
-		//isDone = false;
-		System.out.println(round);
-		switch(round) {
-		case NORMAL: {
-			game.beginRoundOne();
-			round = GameType.DOUBLE;
-			//exit(true);
-		} break;
-		case DOUBLE: {
-			game.beginRoundTwo();
-			round = GameType.FINAL;
-			//exit(true);
-		} break;
-		case FINAL: {
-			game.beginRoundThree();
-			//exit(true);
-		} break;
-		}
-	}
-	
-	public void buzz(int n) {
-		// TODO Handle teams buzzing in remotly
-	}
-	
-	@SuppressWarnings("unused")
-	private void finalSwitch() {
-		switch(teamSel.getName()) {
-		case "Red": { teamSel = teams.get(1); } break;
-		case "Yellow": { teamSel = teams.get(2); } break;
-		case "Green": { teamSel = teams.get(3); } break;
-		case "Blue": { game.setMode(Mode.RESULTS); } break;
-		}
-		if(game.getMode() != Mode.RESULTS) {
-			gamePanel.displayText(cat.get(0).getQuestion(0).getAnswer(), teamSel.getColor());
-		} else { // TODO make this take less lines, mabe use math.max
-			if(teams.get(0).getScore() > teams.get(1).getScore()) {teamSel = teams.get(0);} else {teamSel = teams.get(1);}
-			if(teamSel.getScore() < teams.get(2).getScore()) {teamSel = teams.get(2);}
-			if(teamSel.getScore() < teams.get(3).getScore()) {teamSel = teams.get(3);}
-			if(teams.get(0).getScore() == teamSel.getScore()) {winners.add(teams.get(0));}
-			if(teams.get(1).getScore() == teamSel.getScore()) {winners.add(teams.get(1));}
-			if(teams.get(2).getScore() == teamSel.getScore()) {winners.add(teams.get(2));}
-			if(teams.get(3).getScore() == teamSel.getScore()) {winners.add(teams.get(3));}
-			if(winners.size() == 1) {
-				gamePanel.displayText("And the winner is:\n" + teamSel.getName(), teamSel.getColor());
-			} else {
-				String out = "";
-				int red = 0;
-				int green = 0;
-				int blue = 0;
-				for(int i = 0; i < winners.size(); i++) { 
-					if(i != 0) {
-						out = out + ", ";
-					}
-					out = out + winners.get(i).getName();
-					red = red + winners.get(i).getColor().getRed();
-					green = green + winners.get(i).getColor().getGreen();
-					blue = blue + winners.get(i).getColor().getBlue();
-				}
-				red = red / winners.size();
-				green = green / winners.size();
-				blue = blue / winners.size();
-				gamePanel.displayText("And the winner is:\n" + out, new Color(0xfe, 0x67, 0x00));
-				game.setMode(Mode.SCORE);
 			}
 		}
 	}

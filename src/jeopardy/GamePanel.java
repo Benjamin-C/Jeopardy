@@ -18,6 +18,11 @@ public class GamePanel{
 	
 	private List<Team> teams;
 	
+	private int selCat;
+	private List<Category> categories;
+	
+	private Color textColor;
+	
 	public GamePanel(JFrame j, List<Team> teams) {
 		jf = j;
 		this.teams = teams;
@@ -27,10 +32,27 @@ public class GamePanel{
 		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		ImageIcon img = new ImageIcon("icon.png");
 		jf.setIconImage(img.getImage());
+		selCat = -1;
+		categories = null;
+		textColor = Color.WHITE;
 	}
 
+	public void selCat(int n) {
+		selCat = n;
+		drawMainPanel();
+	}
+	
+	public void setCategory(List<Category> cat) {
+		categories = cat;
+	}
+	
+	public boolean drawMainPanel() {
+		return drawMainPanel(categories);
+	}
+	
 	@SuppressWarnings("serial")
 	public boolean drawMainPanel(List<Category> cat) {
+		categories = cat;
 		panel = new JPanel() {
 			@Override
             public void paintComponent(Graphics g) {
@@ -48,24 +70,36 @@ public class GamePanel{
                 g.setFont(new Font(g.getFont().getName(), Font.PLAIN, 20));
                 for(int i = 0; i < cat.size(); i++) {
                 	if(!cat.get(i).isDone()) {
-	                	g.setColor(Color.RED);
+                		if(i == selCat) {
+                			g.setColor(new Color(255, 128, 0)); // Set light red if category is selected
+                			textColor = Color.BLACK;
+                		} else {
+                			g.setColor(Color.RED);
+                			textColor = Color.WHITE;
+                		}
 	                	text = cat.get(i).getName();
 	                	g.fillRect((getWidth() / 7) * i, 0, (getWidth() / 7) - 10, (getHeight() / 6) - 10);
 	                	sw = g.getFontMetrics().stringWidth(text);
 	            		sh = g.getFontMetrics().getHeight();
 	            		x = (bw * i) + ((bw - sw) / 2);
 	            		y = ((bh - sh) / 2);
-	            		g.setColor(Color.WHITE);
+	            		g.setColor(textColor);
 	            		g.drawString(text, x, y);
 	                	for(int j = 0; j < cat.get(i).size(); j++) {
 	                		if(!cat.get(i).getQuestion(j).isUsed()) {
-		                		g.setColor(Color.BLUE);
-		                		g.fillRect((getWidth() / 7) * i, (getHeight() / 6) * (j + 1), (getWidth() / 7) - 10, (getHeight() / 6) - 10);
+	                			if(i == selCat) {
+	                				g.setColor(new Color(64, 128, 255));
+	                				textColor = Color.BLACK;
+	                			} else {
+	                				g.setColor(Color.BLUE);
+	                				textColor = Color.WHITE;
+	                			}
+                				g.fillRect((getWidth() / 7) * i, (getHeight() / 6) * (j + 1), (getWidth() / 7) - 10, (getHeight() / 6) - 10);
 		                		text = cat.get(i).getQuestion(j).getScore() + "";
 		                		sw = g.getFontMetrics().stringWidth(text);
 		                		x = (bw * i) + ((bw - sw) / 2);
 		                		y = (bh * (j + 1)) + ((bh - sh) / 2);
-		                		g.setColor(Color.WHITE);
+		                		g.setColor(textColor);
 		                		g.drawString(text, x, y);
 	                		}
 	                	}

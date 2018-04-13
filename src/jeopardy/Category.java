@@ -95,7 +95,7 @@ public class Category {
 					l++;
 				}
 				pts = (questions.size() + 1) * pp;
-				questions.add(new Question(q, a, pts));
+				questions.add(new Question(q, a, pts, false));
 			}
 			
 		} catch (FileNotFoundException e) {

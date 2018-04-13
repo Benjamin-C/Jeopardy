@@ -6,17 +6,20 @@ public class Question {
 	private String answer;
 	private int points;
 	private boolean isUsed;
+	private boolean isDouble;
 	
-	public Question(String q, String a, int p) {
+	public Question(String q, String a, int p, boolean d) {
 		question = q;
 		answer = a;
 		points = p;
+		isDouble = d;
 	}
 	
 	public Question(String q, String a) {
 		question = q;
 		answer = a;
 		points = 0;
+		isDouble = false;
 	}
 	
 	@Override
@@ -24,6 +27,14 @@ public class Question {
 		return question + ", " + answer;
 	}
 	
+	public boolean isDouble() {
+		return isDouble;
+	}
+
+	public void setDouble(boolean isDouble) {
+		this.isDouble = isDouble;
+	}
+
 	public String getQuestion() {
 		return question;
 	}
