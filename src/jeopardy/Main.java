@@ -9,7 +9,45 @@ public class Main {
 	static String mode = "KEYBOARD";
 	
 	public static void main(String args[]) {
-		Game game = new Game("KEYBOARD");
+		
+		Serial s = new Serial("", 0, new SerialEvent() {
+
+			@Override
+			public void onDataAvaliable(byte data) {
+				// TODO Auto-generated method stub
+				System.out.println(data);
+			}
+
+			@Override
+			public void IOException(java.io.IOException e) {
+				// TODO Auto-generated method stub
+				e.printStackTrace();
+			}
+			
+		});
+		s.startListening();
+		System.out.println("Starting");
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		s.stopListening();
+		System.out.println("Stopping");
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		System.out.println("listening: " + s.checkListening());
+		
+		System.out.println("Done");
+		System.exit(0);
+		Game game = new Game(InputMode.ARDUINO);
 		game.begin();
 		
 	}

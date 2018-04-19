@@ -18,22 +18,38 @@ public class Game {
 	private Mode mode;
 	private int numDoubles = 2;
 	private ActionCenter actionCenter;
+	private InputMode inputMode;
 	
-	public Game(String inputMode) {
+	public Game(InputMode inMode) {
 		// Init vars
+		inputMode = inMode;
+				
+		// Set up teams
 		teams = new ArrayList<Team>();
 		teams.add(new Team(Color.RED, "Red"));
 		teams.add(new Team(Color.YELLOW, "Yellow"));
 		teams.add(new Team(Color.GREEN, "Green"));
 		teams.add(new Team(Color.CYAN, "Blue"));
+		
+		// Make the JFrame to see things
 		jf = new JFrame();
+		
+		// Setup mode to initilization
 		mode = Mode.INIT;
 		
+		// Create the main parts of the game
 		gamePanel = new GamePanel(jf, teams);
 		actionCenter = new ActionCenter(gamePanel, this, teams);
 		keyListen = new KeyListen(this, actionCenter);
 		
+		// Setup input modes
+		switch(inputMode) {
+		case APP: System.out.println("This mode is currently not supported. Please select another mode then try again"); System.exit(1); break;
+		case ARDUINO: try { SerialOLD.begin(actionCenter); } catch (Exception e1) { System.out.println("Something went wrong initializing the arduino!"); /*System.exit(1);*/ }; break;
+		case KEYBOARD: keyListen.mayTeamsBuzzByKeyboard(true); break;
+		}
 		
+		// Activate key listeners for commander
 		jf.addKeyListener(new KeyListener() {
 			@Override public void keyTyped(KeyEvent e) {keyListen.keyTyped(e);}
 			@Override public void keyReleased(KeyEvent e) {keyListen.keyReleased(e);}
@@ -46,15 +62,6 @@ public class Game {
 		nullCat.add(new Question("null", "null"));
 		nullCatList.add(nullCat);
 		actionCenter.setQuestions(nullCatList);
-				
-		// Setup input modes
-		switch(inputMode) {
-		case "KEYBOARD": { } break;
-		case "EXTERNAL": {try { Serial.begin(); } catch (Exception e1) { e1.printStackTrace(); } } break;
-		case "APP": { System.out.println("This mode is currently not supported. Please select another mode then try again"); System.exit(1);} break;
-		}
-		
-		
 	}
 	
 	public void begin() {
@@ -65,10 +72,10 @@ public class Game {
 			public void run() {
 				setMode(Mode.INIT);
 				actionCenter.setSyncObject(sync);
-				Util.pause(sync); // Wait for boss to be ready
-				beginNormalRound(new String[] {"cooking", "doit", "flag", "hiking", "lashings", "lifeordeath"});
+				Util.pause(sync); // Wait for commander to be ready
+				beginNormalRound(new String[] {"cooking", "doit", "flag", "hiking", "lashings", "lifeordeath"}, 1);
 				Util.pause(sync); // Wait for round one to be done
-				beginNormalRound(new String[] {"fire", "firstaid", "knives", "knots", "scoutstuff", "water"});
+				beginNormalRound(new String[] {"fire", "firstaid", "knives", "knots", "scoutstuff", "water"}, 2);
 				Util.pause(sync); // wait for round two to be done
 				System.out.println("Round 2 done");
 				System.exit(0);

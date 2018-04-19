@@ -1,19 +1,18 @@
 package jeopardy;
 
-import java.awt.Color;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.List;
 
 public class KeyListen {
 	
 	private ActionCenter actionCenter;
 	private Game game;
 	private boolean enabled;
+	private boolean mayBuzzByKeyboard;
 	
 	public KeyListen(Game g, ActionCenter ac) {
 		actionCenter = ac;
 		game = g;
+		mayBuzzByKeyboard = false;
 	}
 	
 	public void enable() {
@@ -68,16 +67,17 @@ public class KeyListen {
 				}	
 			} break; // End mode SELECT
 			case BUZZ: {
-				switch(key) {
-				// Happens when a team buzzes in
-				case KeyEvent.VK_F5: actionCenter.setlectTeam(0); break;
-				case KeyEvent.VK_F6: actionCenter.setlectTeam(1); break;
-				case KeyEvent.VK_F7: actionCenter.setlectTeam(2); break;
-				case KeyEvent.VK_F8: actionCenter.setlectTeam(3); break;
-				
-				//Cancel team selection
-				case KeyEvent.VK_ESCAPE: actionCenter.cancelTeamSelection(); break;
+				if(mayBuzzByKeyboard) {
+					switch(key) {
+					// Happens when a team buzzes in
+					case KeyEvent.VK_F5: actionCenter.buzz(0); break;
+					case KeyEvent.VK_F6: actionCenter.buzz(1); break;
+					case KeyEvent.VK_F7: actionCenter.buzz(2); break;
+					case KeyEvent.VK_F8: actionCenter.buzz(3); break;
+					}
 				}
+				//Cancel team selection
+				if(key == KeyEvent.VK_ESCAPE) { actionCenter.cancelTeamSelection(); }
 			} break; // end mode BUZZ
 			case ANSWER: {
 				switch(key) {
@@ -134,5 +134,9 @@ public class KeyListen {
 				break;
 			}
 		}
+	}
+	
+	public void mayTeamsBuzzByKeyboard(boolean may) {
+		mayBuzzByKeyboard = may;
 	}
 }

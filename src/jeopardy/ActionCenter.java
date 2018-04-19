@@ -1,7 +1,5 @@
 package jeopardy;
 
-import java.awt.Color;
-import java.awt.event.KeyEvent;
 import java.util.List;
 
 public class ActionCenter {
@@ -45,6 +43,12 @@ public class ActionCenter {
 	}
 	
 	//--------------------------------
+	//  _____           _   _   
+	//  |_   _|         (_) | |  
+	//    | |    _ __    _  | |_ 
+	//    | |   | '_ \  | | | __|
+	//   _| |_  | | | | | | | |_ 
+	//  |_____| |_| |_| |_|  \__|                         
 	// init methods
 	public void begin() { // Let the handler thread know we are ready to begin
 		Util.resume(sync);
@@ -54,6 +58,12 @@ public class ActionCenter {
 	}
 	
 	//--------------------------------
+	//   _    _   _     _   _ 
+	//  | |  | | | |   (_) | |
+	//  | |  | | | |_   _  | |
+	//  | |  | | | __| | | | |
+	//  | |__| | | |_  | | | |
+	//   \____/   \__| |_| |_|
 	// Utility methods
 	public void setSyncObject(Object s) { // Set the object used to let the handler thread know stuff
 		sync = s; 
@@ -69,6 +79,12 @@ public class ActionCenter {
 	}
 	
 	//--------------------------------
+	//    ____                       
+	//   / __ \                      
+	//  | |  | |  _   _    ___   ___ 
+	//  | |  | | | | | |  / _ \ / __|
+	//  | |__| | | |_| | |  __/ \__ \
+	//   \___\_\  \__,_|  \___| |___/                               
 	// Question selection methods
 	public void selectCategory(int num) { // Select which category is being used
 		selCat = cat.get(num);
@@ -94,6 +110,12 @@ public class ActionCenter {
 	};
 	
 	//--------------------------------
+	//   _   _                     
+	//  | \ | |                    
+	//  |  \| |  _   _   _ __ ___  
+	//  | . ` | | | | | | '_ ` _ \ 
+	//  | |\  | | |_| | | | | | | |
+	//  |_| \_|  \__,_| |_| |_| |_|
 	// Number selection methods
 	private void pickNumber(Runnable whenDone, Runnable whenCancel) {
 		whenNumberSelectionDone = whenDone;
@@ -131,18 +153,18 @@ public class ActionCenter {
 	}
 	
 	//--------------------------------
+	//  _______                        
+	// |__   __|                       
+	//    | |  ___    __ _   _ __ ___  
+	//    | | / _ \  / _` | | '_ ` _ \ 
+	//    | ||  __/ | (_| | | | | | | |
+	//    |_| \___|  \__,_| |_| |_| |_|
 	// Team selection methods
 	public void selectModTeam(int n) {
 		teamMod = teams.get(n);
 		gamePanel.displayText(teamMod.getName() + ": \n", teamMod.getColor());
 		pickNumber( new Runnable() { @Override public void run() { if(isModifyAdditive) { teamMod.setScore(teamMod.getScore() + num);} else {teamMod.setScore(num); } game.setMode(Mode.SELECT); gamePanel.drawMainPanel(); } },
 				new Runnable() {@Override public void run() { game.setMode(Mode.SELECT); gamePanel.drawMainPanel();} });
-	}
-	public void setlectTeam(int n) {
-		Team t = teams.get(n);
-		gamePanel.displayText(selQues.getQuestion(), t.getColor());
-		teamAns = t;
-		game.setMode(Mode.ANSWER);
 	}
 	public void cancelTeamSelection() {
 		selQues.setIsUsed(false);
@@ -160,7 +182,12 @@ public class ActionCenter {
 	}
 	
 	//--------------------------------
-	// Answering methods
+	//     /\                  
+	//    /  \     _ __    ___ 
+	//   / /\ \   | '_ \  / __|
+	//  / ____ \  | | | | \__ \
+	// /_/    \_\ |_| |_| |___/
+    // Answering methods
 	public void teamAnsworedCorrectly() {
 		gamePanel.displayText(selQues.getAnswer()); // Show answer
 		teamAns.addScore(selQues.getScore());
@@ -202,8 +229,17 @@ public class ActionCenter {
 	}
 	
 	//--------------------------------
+	//   ____                      
+	//  |  _ \                     
+	//  | |_) |  _   _   ____  ____
+	//  |  _ <  | | | | |_  / |_  /
+	//  | |_) | | |_| |  / /   / / 
+	//  |____/   \__,_| /___| /___|                            
 	// Buzzing in methods
 	public void buzz(int n) {
-		// TODO Handle teams buzzing in remotly
+		Team t = teams.get(n);
+		gamePanel.displayText(selQues.getQuestion(), t.getColor());
+		teamAns = t;
+		game.setMode(Mode.ANSWER);
 	}
 }
