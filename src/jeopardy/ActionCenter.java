@@ -242,4 +242,26 @@ public class ActionCenter {
 		teamAns = t;
 		game.setMode(Mode.ANSWER);
 	}
+	
+	//--------------------------------
+	//                   _     _                   _          
+	//    /\            | |   (_)                 | |         
+	//   /  \      ___  | |_   _  __   __   __ _  | |_    ___ 
+	//  / /\ \    / __| | __| | | \ \ / /  / _` | | __|  / _ \
+	// / ____ \  | (__  | |_  | |  \ V /  | (_| | | |_  |  __/
+	///_/    \_\  \___|  \__| |_|   \_/    \__,_|  \__|  \___|
+	// Activate team buzzer methods
+                                         
+	public void activate(int n) {
+		if(n >= 0 ) {
+			teams.get(n).setGuessed(true);
+			System.out.println("HasGuessed = true for " + n);
+		}
+		gamePanel.show4Parts(
+				teams.get(0).getName() + "\n" + teams.get(0).hasGuessed(),
+				teams.get(1).getName() + "\n" + teams.get(1).hasGuessed(),
+				teams.get(2).getName() + "\n" + teams.get(2).hasGuessed(),
+				teams.get(3).getName() + "\n" + teams.get(3).hasGuessed()
+				);
+	}
 }

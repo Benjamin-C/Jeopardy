@@ -1,0 +1,23 @@
+[Host]:Trying to start on D-SOUT-166-09/10.197.155.233:499
+[Host]:Client connectd, ready for data
+[Host]:Ready
+Team 0 Server starting
+Team 1 Server starting
+Team 2 Server starting
+Team 3 Server starting
+Exception in thread "main" java.lang.IndexOutOfBoundsException: Index: 0, Size: 0
+	at java.util.ArrayList.rangeCheck(Unknown Source)
+	at java.util.ArrayList.get(Unknown Source)
+	at jeopardy.Game.<init>(Game.java:116)
+	at jeopardy.Main.main(Main.java:19)
+[Team0] Waiting for player 0
+[Team2] Waiting for player 2
+[Team1] Waiting for player 1
+[Team3] Waiting for player 3
+[Team0]:Trying to start on D-SOUT-166-09/10.197.155.233:500
+[Team2]:Trying to start on D-SOUT-166-09/10.197.155.233:502
+[Team3]:Trying to start on D-SOUT-166-09/10.197.155.233:503
+[Team1]:Trying to start on D-SOUT-166-09/10.197.155.233:501
+[Team0]:Client connectd, ready for data
+[Team0]:Ready
+HasGuessed = true for 0

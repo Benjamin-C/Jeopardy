@@ -246,4 +246,81 @@ public class GamePanel{
 		y = ch + (sh / 2);
 		g.drawString(Integer.toString(team.getScore()), x, y);
 	}
+	
+	@SuppressWarnings("serial")
+	public boolean show4Parts(String tl, String tr, String bl, String br) {
+		panel = new JPanel() {
+        	@Override
+            public void paintComponent(Graphics g) {
+                super.paintComponent(g);
+				int x = jf.getWidth() / 3;
+				int y = jf.getHeight() / 3;
+				g.setFont(new Font(g.getFont().getName(), Font.PLAIN, 40));
+		        g.setColor(Color.BLACK);
+		        g.fillRect(0,  0,  getWidth(), getHeight());
+		        double mw = getWidth() / 2 * 0.9d;
+		        displayCornerText(tl, Color.RED, x, y, mw, g);
+		        displayCornerText(tr, Color.YELLOW, x * 2, y, mw, g);
+		        displayCornerText(bl, Color.GREEN, x, y * 2, mw, g);
+		        displayCornerText(br, Color.BLUE, x * 2, y * 2, mw, g);
+        	}
+		};
+		jf.add(panel);
+        jf.validate();
+		return true;
+	}
+	
+	private void displayCornerText(String text, Color col, int cx, int ch, double maxWidth, Graphics g) {
+        int sw = g.getFontMetrics().stringWidth(text);
+        int sh = g.getFontMetrics().getHeight();
+        int x;
+        int y;
+        
+        double width = maxWidth;
+        		
+        String textA = "";
+        String textB = "";
+        boolean twoLine = false;
+        int loc = 0;
+        if(text.contains("\n")) {
+        	loc = text.indexOf("\n");
+        	textA = text.substring(0,  loc++);
+        	textB = text.substring(loc, text.length());
+        	twoLine = true;
+        } else if(text.contains("\\n")) {
+        	loc = text.indexOf("\\n");
+        	textA = text.substring(0,  loc++);
+        	textB = text.substring(++loc, text.length());
+        	twoLine = true;
+        } else if(sw > width * (9d/10d)) {
+        	loc = text.length() / 2;
+        	try {
+	        	while(text.charAt(loc) != ' ') {
+	        		loc++;
+	        	}
+        	} catch (StringIndexOutOfBoundsException e) {
+        		loc = text.length() / 2;
+        	}
+        	textA = text.substring(0, loc++);
+        	textB = text.substring(loc, text.length());
+        	twoLine = true;
+        }
+        if(twoLine) {
+	        sw = g.getFontMetrics().stringWidth(textA);
+	        x = cx - (sw / 2);
+			y = ch - (sh / 2);
+			g.setColor(col);
+			g.drawString(textA, x, y);
+			sw = g.getFontMetrics().stringWidth(textB);
+			x = cx - (sw / 2);
+			y = ch + (sh / 2);
+			g.drawString(textB, x, y);
+        } else {
+        	sw = g.getFontMetrics().stringWidth(textA);
+	        x = cx - (sw / 2);
+			y = ch;
+			g.setColor(col);
+			g.drawString(text, x, y);
+        }
+	}
 }

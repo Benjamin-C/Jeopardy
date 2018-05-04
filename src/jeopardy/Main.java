@@ -15,7 +15,9 @@ public class Main {
 	volatile static Serial ser;
 	
 	public static void main(String args[]) {
-		networkTest0();
+		System.out.println("Jeopardy");
+		Game game = new Game(InputMode.APP);
+		game.begin();
 	}
 	
 	public static void networkTest0() {
