@@ -13,6 +13,11 @@ public class PrintStreamDuplicator extends PrintStream {
 	PrintStream a;
 	PrintStream b;
 	
+	public PrintStreamDuplicator(PrintStream a, PrintStream b) {
+		super(new OutputStream() { @Override public void write(int b) throws IOException { } });
+		this.a = a;
+		this.b = b;
+	}
 	public PrintStreamDuplicator(File file1, File file2) throws FileNotFoundException {
 		super(new OutputStream() { @Override public void write(int b) throws IOException { } });
 		a = new PrintStream(file1);

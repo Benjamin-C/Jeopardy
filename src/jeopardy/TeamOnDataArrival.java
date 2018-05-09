@@ -15,7 +15,7 @@ public class TeamOnDataArrival implements TCPOnDataArrival{
 	public void onDataArrived(byte[] data) {
 		if(data.length > 0) {
 			switch(data[0]) {
-			case 0x01: {// Buzz
+			case 0x40: {// Buzz
 				actionCenter.buzz(num);
 			} break;
 			}

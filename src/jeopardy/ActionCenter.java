@@ -1,5 +1,7 @@
 package jeopardy;
 
+import java.net.Inet4Address;
+import java.net.UnknownHostException;
 import java.util.List;
 
 public class ActionCenter {
@@ -257,11 +259,22 @@ public class ActionCenter {
 			teams.get(n).setGuessed(true);
 			System.out.println("HasGuessed = true for " + n);
 		}
-		gamePanel.show4Parts(
-				teams.get(0).getName() + "\n" + teams.get(0).hasGuessed(),
-				teams.get(1).getName() + "\n" + teams.get(1).hasGuessed(),
-				teams.get(2).getName() + "\n" + teams.get(2).hasGuessed(),
-				teams.get(3).getName() + "\n" + teams.get(3).hasGuessed()
-				);
+		String[] parts = {"", "", "", ""};
+		for(int i = 0; i < parts.length; i++) {
+			String t = "Ready";
+			if(!teams.get(i).hasGuessed()) {
+				try {
+					String ad = Inet4Address.getLocalHost().toString();
+					String str = ad.substring(ad.indexOf('/')+1);
+					t = str + ":" + (500 + i);
+				} catch (UnknownHostException e) {
+					t = "err";
+				}
+			}
+			t = teams.get(i).getName() + "\n" + t;
+			parts[i] = t;
+		}
+		gamePanel.show4Parts(parts[0], parts[1], parts[2], parts[3]);
+		Util.resume(sync);
 	}
 }

@@ -1,5 +1,7 @@
 package jeopardy;
 
+import java.util.Set;
+
 public class Util {
 
 	public static void pause(Object sync) {
@@ -16,5 +18,13 @@ public class Util {
         synchronized(sync) {
             sync.notify();
         }
+    }
+    
+    public static void showThreads() {
+    	Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+		Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);
+		for(int i = 0; i < threadArray.length; i++) {
+			System.out.println("[" + i + "]: " + threadArray[i]);
+		}
     }
 }

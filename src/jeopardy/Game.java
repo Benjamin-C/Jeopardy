@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.Set;
 
 import javax.swing.JFrame;
 import benjamin.BenTCP.*;
@@ -27,7 +28,7 @@ public class Game {
 	private KeyListen keyListen;
 	private Mode mode;
 	private int numDoubles = 2;
-	private ActionCenter actionCenter;
+	private volatile ActionCenter actionCenter;
 	private InputMode inputMode;
 	Serial serial;
 	
@@ -41,22 +42,18 @@ public class Game {
 	Scanner scan = new Scanner(System.in);
 	
 	private File log;
+	private PrintStream outputPrintStream;
 	private PrintStream logPrintStream;
 	
 	public Game(InputMode inMode) {
 		// Setup logger
-		DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss");
+		DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 		Date cal = new Date();
-		System.out.println(dateFormat.format(cal)); //2016/11/16 12:08:43
-		log = new File("logs/" + dateFormat.format(cal));
-		try {
-			logPrintStream = new PrintStreamDuplicator(log);
-		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		System.setOut(logPrintStream);
-		System.setErr(logPrintStream);
+		System.out.println("logname = " + dateFormat.format(cal) + ".txt"); //2016/11/16 12:08:43
+		try { logPrintStream = new PrintStream("logs/" + dateFormat.format(cal) + ".txt"); } catch (FileNotFoundException e1) { e1.printStackTrace(); }
+		outputPrintStream = new PrintStreamDuplicator(logPrintStream, System.out);
+		System.setOut(outputPrintStream);
+		System.setErr(outputPrintStream);
 		
 		// Init vars
 		inputMode = inMode;
@@ -82,6 +79,7 @@ public class Game {
 		// Setup input modes
 		switch(inputMode) {
 		case APP:  {
+			System.out.println("[Warn] The mode APP is currently not supported. Preformance may be unreliable");
 			TCPOnDataArrival odr = new TCPOnDataArrival() {
 				@Override public void onDataArrived(byte[] data) {
 					if(data.length < 0) {
@@ -103,29 +101,36 @@ public class Game {
 				    return sb.toString();
 				}
 			};
+			Util.showThreads();
 			gamePanel.displayText("Waiting for host to connect\nPlease do so quickly so I can take a nap");
 			serverHost = new TCPServer(499, odr, new DefaultTCPSetupStream(scan, "Host"));
 			serverHostOutputStream = serverHost.getOutputStream();
 			serverPlayers = new ArrayList<TCPServer>();
-			
+			Object starterSync = new Object();
+			actionCenter.setSyncObject(starterSync);
+			actionCenter.activate(-1);
 			for(int i = 0; i < PLAYER_COUNT; i++) {
 				System.out.println("Team " + i + " Server starting");
+				serverPlayers.add(i, null);
 				ServerStarter st = new ServerStarter(i, actionCenter, serverPlayers);
-				new Thread(st).start();
+				new Thread(st, "connectorThread" + i).start();
 			}
-			System.out.println(serverPlayers.get(0) == null);
+			Util.showThreads();
 			boolean done = false;
-			while(!done) {
-				if(serverPlayers.size() == PLAYER_COUNT) {
-					done = true;
-					for(int i = 0; i < PLAYER_COUNT; i++) {
-						if(serverPlayers.get(i) == null) {
-							done = false;
-						}
+			do {
+				Util.pause(starterSync);
+				done = true;
+				System.out.println("Testing if done");
+				for(TCPServer s : serverPlayers) {
+					if(s == null) {
+						done = false;
+						break;
 					}
+					System.out.println(s);
 				}
-			}
-			System.out.println("This mode is currently not supported. Preformance may be unreliable");}
+			} while(!done);
+			Util.showThreads();
+		}
 		break;
 		//case ARDUINO: try { Serial.begin(actionCenter); } catch (Exception e1) { System.out.println("Something went wrong initializing the arduino!"); /*System.exit(1);*/ }; break;
 		case KEYBOARD: keyListen.mayTeamsBuzzByKeyboard(true); break;
