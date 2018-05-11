@@ -82,30 +82,10 @@ public class Game {
 		switch(inputMode) {
 		case APP:  {
 			System.out.println("[Warn] The mode APP is currently not supported. Preformance may be unreliable");
-			TCPOnDataArrival odr = new TCPOnDataArrival() {
-				@Override public void onDataArrived(byte[] data) {
-					if(data.length < 0) {
-						switch(data[0]) {
-						case 55: {
-							actionCenter.buzz(0);
-						} break; // case 55
-						default: {
-							for(int i = 0; i < data.length; i++) {
-								System.out.print(toHex(data[i]));
-							} System.out.println();
-						} break; // default
-						}
-					}
-				}
-				private String toHex(byte in) {
-				    StringBuilder sb = new StringBuilder();
-				    sb.append(String.format("%02X", in) + "");
-				    return sb.toString();
-				}
-			};
+			TCPOnDataArrival odr = new CommanderOnDataArrival(actionCenter);
 			Util.showThreads();
 			gamePanel.displayText("Waiting for host to connect\nPlease do so quickly so I can take a nap");
-			serverHost = new TCPServer(499, odr, new DefaultTCPSetupStream(scan, "Host"));
+			serverHost = new TCPServer(499, odr, new DefaultTCPSetupStream(scan, "Host"), 1);
 			serverHostOutputStream = serverHost.getOutputStream();
 			serverPlayers = new ArrayList<TCPServer>();
 			Object starterSync = new Object();
@@ -117,19 +97,12 @@ public class Game {
 				ServerStarter st = new ServerStarter(i, actionCenter, serverPlayers);
 				new Thread(st, "connectorThread" + i).start();
 			}
+			System.out.println("Showing Threads");
 			Util.showThreads();
 			boolean done = false;
 			do {
 				Util.pause(starterSync);
-				done = true;
-				System.out.println("Testing if done");
-				for(TCPServer s : serverPlayers) {
-					if(s == null) {
-						done = false;
-						break;
-					}
-					System.out.println(s);
-				}
+				done = actionCenter.hasEveryoneActivated();
 			} while(!done);
 			Util.showThreads();
 		}

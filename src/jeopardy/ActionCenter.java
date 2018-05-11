@@ -277,4 +277,13 @@ public class ActionCenter {
 		gamePanel.show4Parts(parts[0], parts[1], parts[2], parts[3]);
 		Util.resume(sync);
 	}
+	public boolean hasEveryoneActivated() {
+		boolean isdone = true;
+		for(Team t : teams) {
+			if(!t.hasGuessed()) {
+				isdone = false;
+			}
+		}
+		return isdone;
+	}
 }

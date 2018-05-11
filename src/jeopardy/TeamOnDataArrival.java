@@ -9,14 +9,16 @@ public class TeamOnDataArrival implements TCPOnDataArrival{
 	
 	public TeamOnDataArrival(int num, ActionCenter actionCenter) {
 		this.num = num;
+		this.actionCenter = actionCenter;
 	}
 	
 	@Override
 	public void onDataArrived(byte[] data) {
 		if(data.length > 0) {
 			switch(data[0]) {
-			case 0x40: {// Buzz
+			case 0x50: {// Buzz
 				actionCenter.buzz(num);
+				System.out.println("Buzzing " + num);
 			} break;
 			}
 		}

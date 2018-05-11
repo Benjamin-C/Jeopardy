@@ -21,7 +21,7 @@ public class ServerStarter implements Runnable{
 		System.out.println("[Team" + num + "] Waiting for player " + num);
 		Scanner s = new Scanner(System.in);
 		int port = 500 + num;
-		serverPlayers.set(num, new TCPServer(port, new TeamOnDataArrival(0, actionCenter), new DefaultTCPSetupStream(s,  "Team" + num)));
+		serverPlayers.set(num, new TCPServer(port, new TeamOnDataArrival(0, actionCenter), new DefaultTCPSetupStream(s,  "Team" + num), 1));
 		actionCenter.activate(num);
 	}
 }
