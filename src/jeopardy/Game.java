@@ -44,6 +44,7 @@ public class Game {
 	private File log;
 	private PrintStream outputPrintStream;
 	private PrintStream logPrintStream;
+	private PrintStream tracedPrintStream;
 	
 	public Game(InputMode inMode) {
 		// Setup logger
@@ -52,7 +53,8 @@ public class Game {
 		System.out.println("logname = " + dateFormat.format(cal) + ".txt"); //2016/11/16 12:08:43
 		try { logPrintStream = new PrintStream("logs/" + dateFormat.format(cal) + ".txt"); } catch (FileNotFoundException e1) { e1.printStackTrace(); }
 		outputPrintStream = new PrintStreamDuplicator(logPrintStream, System.out);
-		System.setOut(outputPrintStream);
+		tracedPrintStream = new TracedPrintStream(outputPrintStream);
+		System.setOut(tracedPrintStream);
 		System.setErr(outputPrintStream);
 		
 		// Init vars
