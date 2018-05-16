@@ -30,6 +30,11 @@ public class KeyListen {
 		int key = e.getKeyCode();
 		if(enabled) {
 			switch(game.getMode()) {
+			case CONNECT: {
+				if(e.getKeyCode() == KeyEvent.VK_ENTER && e.getKeyLocation() == 1) {
+					for(int i = 0; i < 4; i++) { actionCenter.activate(i); }
+				}
+			} break;
 			case INIT: {
 				if(e.getKeyCode() == KeyEvent.VK_ENTER && e.getKeyLocation() == 1) {
 					actionCenter.begin();

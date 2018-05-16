@@ -281,6 +281,7 @@ public class ActionCenter {
 		boolean isdone = true;
 		for(Team t : teams) {
 			if(!t.hasGuessed()) {
+				//System.out.println(t + " " + t.hasGuessed());
 				isdone = false;
 			}
 		}

@@ -1,6 +1,7 @@
 package jeopardy;
 
 public enum Mode {
+	CONNECT, // wait for teams to connect
 	INIT, // Get everything set up
 	SELECT, // Select a question
 	BUZZ, // Wait for temas to buzz in

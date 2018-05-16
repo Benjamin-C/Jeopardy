@@ -81,9 +81,9 @@ public class Game {
 		// Setup input modes
 		switch(inputMode) {
 		case APP:  {
+			setMode(Mode.CONNECT);
 			System.out.println("[Warn] The mode APP is currently not supported. Preformance may be unreliable");
-			TCPOnDataArrival odr = new CommanderOnDataArrival(actionCenter);
-			Util.showThreads();
+			TCPOnDataArrival odr = new CommanderOnDataArrival(actionCenter, this);
 			gamePanel.displayText("Waiting for host to connect\nPlease do so quickly so I can take a nap");
 			serverHost = new TCPServer(499, odr, new DefaultTCPSetupStream(scan, "Host"), 1);
 			serverHostOutputStream = serverHost.getOutputStream();
@@ -97,14 +97,13 @@ public class Game {
 				ServerStarter st = new ServerStarter(i, actionCenter, serverPlayers);
 				new Thread(st, "connectorThread" + i).start();
 			}
-			System.out.println("Showing Threads");
-			Util.showThreads();
 			boolean done = false;
 			do {
 				Util.pause(starterSync);
+				System.out.println(actionCenter.hasEveryoneActivated());
 				done = actionCenter.hasEveryoneActivated();
 			} while(!done);
-			Util.showThreads();
+			setMode(Mode.INIT);
 		}
 		break;
 		//case ARDUINO: try { Serial.begin(actionCenter); } catch (Exception e1) { System.out.println("Something went wrong initializing the arduino!"); /*System.exit(1);*/ }; break;
