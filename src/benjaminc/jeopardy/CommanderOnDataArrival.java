@@ -1,4 +1,4 @@
-package jeopardy;
+package benjaminc.jeopardy;
 
 import javax.swing.plaf.synth.SynthSeparatorUI;
 

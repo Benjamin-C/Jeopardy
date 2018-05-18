@@ -1,4 +1,4 @@
-package jeopardy;
+package benjaminc.jeopardy;
 
 import java.io.File;
 import java.io.FileNotFoundException;

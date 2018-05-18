@@ -1,4 +1,4 @@
-package jeopardy;
+package benjaminc.jeopardy;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

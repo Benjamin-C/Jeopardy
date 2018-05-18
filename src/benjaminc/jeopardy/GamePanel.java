@@ -1,6 +1,6 @@
 //TODO figure out why window resizing can cause drawing issues
 
-package jeopardy;
+package benjaminc.jeopardy;
 
 import java.awt.Color;
 import java.awt.Font;

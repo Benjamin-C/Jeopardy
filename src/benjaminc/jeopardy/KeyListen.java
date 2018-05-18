@@ -1,4 +1,4 @@
-package jeopardy;
+package benjaminc.jeopardy;
 
 import java.awt.event.KeyEvent;
 
@@ -60,7 +60,7 @@ public class KeyListen {
 				// Cancel selection
 				//case KeyEvent.VK_ESCAPE: if(selQues != null) {selQues.setIsUsed(false);gamePanel.drawMainPanel(cat);exit();} break;
 				
-				// FastGame™
+				// FastGame
 				case KeyEvent.VK_M: actionCenter.fastGame(); break;
 				
 				// Set Team Score
