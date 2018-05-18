@@ -178,9 +178,17 @@ public class ActionCenter {
 		isModifyAdditive = false;
 		game.setMode(Mode.SELECT_MOD_TEAM);
 	}
+	public void setTeamScore(int team, int score) {
+		teams.get(team).setScore(score);
+		gamePanel.drawMainPanel();
+	}
 	public void addToTeamScore() {
 		isModifyAdditive = true;
 		game.setMode(Mode.SELECT_MOD_TEAM);
+	}
+	public void addToTeamScore(int team, int score) {
+		teams.get(team).addScore(score);
+		gamePanel.drawMainPanel();
 	}
 	
 	//--------------------------------

@@ -105,9 +105,9 @@ public class Game {
 			} while(!done);
 			setMode(Mode.INIT);
 		}
-		break;
+		//break;
 		//case ARDUINO: try { Serial.begin(actionCenter); } catch (Exception e1) { System.out.println("Something went wrong initializing the arduino!"); /*System.exit(1);*/ }; break;
-		case KEYBOARD: keyListen.mayTeamsBuzzByKeyboard(true); break;
+		case KEYBOARD: System.out.println("allowing kb buzzing");keyListen.mayTeamsBuzzByKeyboard(true); break;
 		}
 		
 		// Activate key listeners for commander

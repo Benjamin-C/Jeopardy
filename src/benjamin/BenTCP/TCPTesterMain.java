@@ -11,7 +11,7 @@ public class TCPTesterMain {
 	public static volatile TCPClient cli;
 	
 	@SuppressWarnings("resource")
-	public static void main(String args[]) {
+	public TCPTesterMain(String args[]) {
 		final Scanner scan = new Scanner(System.in);
 		
 		TCPSetupStream setupStream = new TCPSetupStream() {
