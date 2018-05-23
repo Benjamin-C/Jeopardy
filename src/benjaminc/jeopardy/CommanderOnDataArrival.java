@@ -1,7 +1,5 @@
 package benjaminc.jeopardy;
 
-import javax.swing.plaf.synth.SynthSeparatorUI;
-
 import benjamin.BenTCP.TCPOnDataArrival;
 
 public class CommanderOnDataArrival implements TCPOnDataArrival{

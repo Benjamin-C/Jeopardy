@@ -5,18 +5,15 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
-import java.util.Set;
 
 import javax.swing.JFrame;
 import benjamin.BenTCP.*;
@@ -41,7 +38,6 @@ public class Game {
 	
 	Scanner scan = new Scanner(System.in);
 	
-	private File log;
 	private PrintStream outputPrintStream;
 	private PrintStream logPrintStream;
 	private PrintStream tracedPrintStream;
@@ -62,10 +58,10 @@ public class Game {
 				
 		// Set up teams
 		teams = new ArrayList<Team>();
-		teams.add(new Team(Color.RED, "Red"));
-		teams.add(new Team(Color.YELLOW, "Yellow"));
-		teams.add(new Team(Color.GREEN, "Green"));
-		teams.add(new Team(Color.CYAN, "Blue"));
+		teams.add(new Team(Color.RED, "Red", null));
+		teams.add(new Team(Color.YELLOW, "Yellow", null));
+		teams.add(new Team(Color.GREEN, "Green", null));
+		teams.add(new Team(Color.CYAN, "Blue", null));
 		
 		// Make the JFrame to see things
 		jf = new JFrame();
@@ -82,6 +78,9 @@ public class Game {
 		switch(inputMode) {
 		case APP:  {
 			setMode(Mode.CONNECT);
+			for(Team t : teams) {
+				t.setInputMode(InputMode.APP);
+			}
 			System.out.println("[Warn] The mode APP is currently not supported. Preformance may be unreliable");
 			TCPOnDataArrival odr = new CommanderOnDataArrival(actionCenter, this);
 			gamePanel.displayText("Waiting for host to connect\nPlease do so quickly so I can take a nap");
@@ -108,6 +107,7 @@ public class Game {
 		//break;
 		//case ARDUINO: try { Serial.begin(actionCenter); } catch (Exception e1) { System.out.println("Something went wrong initializing the arduino!"); /*System.exit(1);*/ }; break;
 		case KEYBOARD: System.out.println("allowing kb buzzing");keyListen.mayTeamsBuzzByKeyboard(true); break;
+		case ARDUINO: System.out.println("This mode is not avaliable. Quitting ..."); System.exit(0); break;
 		}
 		
 		// Activate key listeners for commander

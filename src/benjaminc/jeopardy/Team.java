@@ -10,6 +10,8 @@ public class Team {
 	private int num;
 	private String name;
 	private int wager;
+
+	private InputMode inputMode;
 	
 	public Team() {
 		score = 0;
@@ -19,20 +21,17 @@ public class Team {
 		name = "";
 	}
 	
-	public Team(Color c) {
-		score = 0;
-		didGuess = false;
-		color = c;
-		num = ++count;
-		name = "";
+	public Team(Color c, InputMode im) {
+		this(c, "", im);
 	}
 	
-	public Team(Color c, String n) {
+	public Team(Color c, String n, InputMode im) {
 		score = 0;
 		didGuess = false;
 		color = c;
 		num = ++count;
 		name = n;
+		inputMode = im;
 	}
 	
 	public String getName() {
@@ -73,5 +72,13 @@ public class Team {
 	
 	public void setWager(int w) {
 		wager = w;
+	}
+	
+	public InputMode getInputMode() {
+		return inputMode;
+	}
+
+	public void setInputMode(InputMode inputMode) {
+		this.inputMode = inputMode;
 	}
 }

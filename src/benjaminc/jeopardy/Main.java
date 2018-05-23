@@ -20,6 +20,7 @@ public class Main {
 		game.begin();
 	}
 	
+	@SuppressWarnings("resource")
 	public static void networkTest0() {
 		System.out.println("Starting");
 		try {
@@ -35,6 +36,7 @@ public class Main {
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	public static void networkTest() {
 		System.out.println("Starting");
 		try {
@@ -52,6 +54,7 @@ public class Main {
 		}
 	}
 	
+	@SuppressWarnings({ "resource", "unused" })
 	public static void serialTest() {
 		Scanner sca = new Scanner(System.in);
 		
