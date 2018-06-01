@@ -6,10 +6,12 @@ public class TeamOnDataArrival implements TCPOnDataArrival{
 
 	private int num;
 	private ActionCenter actionCenter;
+	Team team;
 	
-	public TeamOnDataArrival(int num, ActionCenter actionCenter) {
+	public TeamOnDataArrival(int num, ActionCenter actionCenter, Team t) {
 		this.num = num;
 		this.actionCenter = actionCenter;
+		team = t;
 	}
 	
 	@Override
@@ -20,6 +22,20 @@ public class TeamOnDataArrival implements TCPOnDataArrival{
 				actionCenter.buzz(num);
 				System.out.println("Buzzing " + num);
 			} break;
+			case 0x30: {// Wager {
+				if(team.getWager() == -2) {
+					System.out.println("odr" + data[0] + " " + data[1] + " " + data[2]);
+					if(data.length >= 3) {
+						int temp = 0;
+						temp = data[1] & 0xff;
+						temp = temp << 8;
+						temp = temp + (data[2] & 0xFF);
+						System.out.println(temp);
+						team.setWager(temp);
+						Util.resume(team.getSyncObject());
+					}
+				}
+			}
 			}
 		}
 	}

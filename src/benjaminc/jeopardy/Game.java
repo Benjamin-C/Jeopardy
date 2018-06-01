@@ -30,7 +30,6 @@ public class Game {
 	Serial serial;
 	
 	public TCPServer serverHost;
-	public List<TCPServer> serverPlayers;
 
 	private final int PLAYER_COUNT = 4;
 	
@@ -86,27 +85,25 @@ public class Game {
 			gamePanel.displayText("Waiting for host to connect\nPlease do so quickly so I can take a nap");
 			serverHost = new TCPServer(499, odr, new DefaultTCPSetupStream(scan, "Host"), 1);
 			serverHostOutputStream = serverHost.getOutputStream();
-			serverPlayers = new ArrayList<TCPServer>();
 			Object starterSync = new Object();
 			actionCenter.setSyncObject(starterSync);
 			actionCenter.activate(-1);
 			for(int i = 0; i < PLAYER_COUNT; i++) {
 				System.out.println("Team " + i + " Server starting");
-				serverPlayers.add(i, null);
-				ServerStarter st = new ServerStarter(i, actionCenter, serverPlayers);
+				ServerStarter st = new ServerStarter(i, actionCenter, teams.get(i));
 				new Thread(st, "connectorThread" + i).start();
 			}
 			boolean done = false;
 			do {
 				Util.pause(starterSync);
-				System.out.println(actionCenter.hasEveryoneActivated());
+				System.out.println("Has everyone activated yet? " + actionCenter.hasEveryoneActivated());
 				done = actionCenter.hasEveryoneActivated();
 			} while(!done);
 			setMode(Mode.INIT);
 		}
 		//break;
 		//case ARDUINO: try { Serial.begin(actionCenter); } catch (Exception e1) { System.out.println("Something went wrong initializing the arduino!"); /*System.exit(1);*/ }; break;
-		case KEYBOARD: System.out.println("allowing kb buzzing");keyListen.mayTeamsBuzzByKeyboard(true); break;
+		case KEYBOARD: System.out.println("allowing keyboard buzzing");keyListen.mayTeamsBuzzByKeyboard(true); break;
 		case ARDUINO: System.out.println("This mode is not avaliable. Quitting ..."); System.exit(0); break;
 		}
 		
@@ -160,7 +157,7 @@ public class Game {
 			if(!q.isDouble()) {
 				q.setDouble(true);
 				doubles++;
-				System.out.println("Added double");
+				System.out.println("Added double>" + c.getName() + ":" + q.getScore());
 			}
 		}
 		gamePanel.drawMainPanel(cat);

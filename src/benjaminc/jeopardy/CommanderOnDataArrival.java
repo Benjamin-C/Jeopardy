@@ -19,7 +19,7 @@ public class CommanderOnDataArrival implements TCPOnDataArrival{
 			switch(game.getMode()) {
 			case CONNECT: {
 				switch(data[0]) {
-				case 0x21: {/* Buzz */for(int i = 0; i < 4; i++) { actionCenter.activate(i); } System.out.println("Buzzing everyone"); } break;
+				case 0x21: {/* Activate all */actionCenter.activateAll(); System.out.println("Buzzing everyone . . ."); } break;
 				default: { System.out.println(defaultCase(data)); } break;
 				}
 			} break;
@@ -31,12 +31,13 @@ public class CommanderOnDataArrival implements TCPOnDataArrival{
 			} break;
 			case SELECT: {
 				switch(data[0]) {
-				case 0x30: {/* Select question */ if(data.length > 1) {actionCenter.selectCategory((int) data[1]);}} break;
-				case 0x31: {/* Select question */ if(data.length > 1) {actionCenter.selectQuestion((int) data[1]);}} break;
-				case 0x32: {/* FastGame */ actionCenter.fastGame(); } break;
-				case 0x33: {/* Set team score */ if(data.length > 3) { actionCenter.setTeamScore(data[1] & 0xFF, ((data[2] * -2) + 1) * (( ((int) data[3] & 0xFF) << 8) + ((int) data[4] & 0xFF)));} } break;
-				case 0x34: {/* add team score */ if(data.length > 3) { actionCenter.addToTeamScore(data[1] & 0xFF, ((data[2] * -2) + 1) * (( ((int) data[3] & 0xFF) << 8) + ((int) data[4] & 0xFF)));} } break;
-				case 0x35: {/* Cancel question selection */ actionCenter.cancelCategorySelection();} break;
+				case 0x30: {/* Select category */ if(data.length > 1) {actionCenter.selectCategory((int) data[1]);}} break;
+				case 0x31: {/* Select points */ if(data.length > 1) {actionCenter.selectPoints((int) data[1]);}} break;
+				case 0x32: {/* Select question */ actionCenter.selectQuestion(); } break;
+				case 0x33: {/* FastGame */ actionCenter.fastGame(); } break;
+				case 0x34: {/* Set team score */ if(data.length > 3) { actionCenter.setTeamScore(data[1] & 0xFF, ((data[2] * -2) + 1) * (( ((int) data[3] & 0xFF) << 8) + ((int) data[4] & 0xFF)));} } break;
+				case 0x35: {/* add team score */ if(data.length > 3) { actionCenter.addToTeamScore(data[1] & 0xFF, ((data[2] * -2) + 1) * (( ((int) data[3] & 0xFF) << 8) + ((int) data[4] & 0xFF)));} } break;
+				case 0x36: {/* Cancel question selection */ actionCenter.cancelCategorySelection();} break;
 				default: { System.out.println(defaultCase(data)); } break;
 				}
 			} break;

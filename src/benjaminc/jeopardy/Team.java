@@ -2,6 +2,8 @@ package benjaminc.jeopardy;
 
 import java.awt.Color;
 
+import benjamin.BenTCP.TCPServer;
+
 public class Team {
 	private int score;
 	private boolean didGuess;
@@ -10,15 +12,14 @@ public class Team {
 	private int num;
 	private String name;
 	private int wager;
+	private Object syncObj;
+
+	private TCPServer server;
 
 	private InputMode inputMode;
 	
 	public Team() {
-		score = 0;
-		didGuess = false;
-		color = Color.BLUE;
-		num = ++count;
-		name = "";
+		this(Color.BLUE, "", null);
 	}
 	
 	public Team(Color c, InputMode im) {
@@ -32,6 +33,7 @@ public class Team {
 		num = ++count;
 		name = n;
 		inputMode = im;
+		syncObj = new Object();
 	}
 	
 	public String getName() {
@@ -74,6 +76,14 @@ public class Team {
 		wager = w;
 	}
 	
+	public int getDoubleAmount() {
+		if(inputMode == InputMode.APP) {
+			wager = -2;
+			Util.pause(syncObj);
+		}
+		return wager;
+	}
+	
 	public InputMode getInputMode() {
 		return inputMode;
 	}
@@ -81,4 +91,17 @@ public class Team {
 	public void setInputMode(InputMode inputMode) {
 		this.inputMode = inputMode;
 	}
+	
+	public TCPServer getServer() {
+		return server;
+	}
+
+	public void setServer(TCPServer server) {
+		this.server = server;
+	}
+	
+	public Object getSyncObject() {
+		return syncObj;
+	}
+
 }

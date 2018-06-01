@@ -19,6 +19,8 @@ public class GamePanel{
 	private List<Team> teams;
 	
 	private int selCat;
+	private int selQues;
+	
 	private List<Category> categories;
 	
 	private Color textColor;
@@ -33,12 +35,17 @@ public class GamePanel{
 		ImageIcon img = new ImageIcon("icon.png");
 		jf.setIconImage(img.getImage());
 		selCat = -1;
+		selQues = -1;
 		categories = null;
 		textColor = Color.WHITE;
 	}
 
 	public void selCat(int n) {
 		selCat = n;
+		drawMainPanel();
+	}
+	public void selQues(int n) {
+		selQues = n;
 		drawMainPanel();
 	}
 	
@@ -87,12 +94,19 @@ public class GamePanel{
 	            		g.drawString(text, x, y);
 	                	for(int j = 0; j < cat.get(i).size(); j++) {
 	                		if(!cat.get(i).getQuestion(j).isUsed()) {
-	                			if(i == selCat) {
+	                			g.setColor(Color.BLUE);
+                				textColor = Color.WHITE;
+                				if(i == selCat) {
 	                				g.setColor(new Color(64, 128, 255));
 	                				textColor = Color.BLACK;
-	                			} else {
-	                				g.setColor(Color.BLUE);
-	                				textColor = Color.WHITE;
+	                			}
+                				if (j == selQues) {
+	                				g.setColor(new Color(64, 128, 255));
+	                				textColor = Color.BLACK;
+	                			}
+                				if (i == selCat && j == selQues){
+	                				g.setColor(new Color(255, 128, 0));
+	                				textColor = Color.BLACK;
 	                			}
                 				g.fillRect((getWidth() / 7) * i, (getHeight() / 6) * (j + 1), (getWidth() / 7) - 10, (getHeight() / 6) - 10);
 		                		text = cat.get(i).getQuestion(j).getScore() + "";

@@ -51,14 +51,17 @@ public class KeyListen {
 				case KeyEvent.VK_Y: actionCenter.selectCategory(5); break;
 		
 				// Select points
-				case KeyEvent.VK_A: actionCenter.selectQuestion(0); break;
-				case KeyEvent.VK_S: actionCenter.selectQuestion(1); break;
-				case KeyEvent.VK_D: actionCenter.selectQuestion(2); break;
-				case KeyEvent.VK_F: actionCenter.selectQuestion(3); break;
-				case KeyEvent.VK_G: actionCenter.selectQuestion(4); break;
+				case KeyEvent.VK_A: actionCenter.selectPoints(0); break;
+				case KeyEvent.VK_S: actionCenter.selectPoints(1); break;
+				case KeyEvent.VK_D: actionCenter.selectPoints(2); break;
+				case KeyEvent.VK_F: actionCenter.selectPoints(3); break;
+				case KeyEvent.VK_G: actionCenter.selectPoints(4); break;
 				
-				// Cancel selection
-				//case KeyEvent.VK_ESCAPE: if(selQues != null) {selQues.setIsUsed(false);gamePanel.drawMainPanel(cat);exit();} break;
+				// Select the question
+				case KeyEvent.VK_ENTER: actionCenter.selectQuestion();
+				
+				// Cancel category selection
+				case KeyEvent.VK_ESCAPE: actionCenter.cancelCategorySelection(); break;// Cancel selection
 				
 				// FastGame
 				case KeyEvent.VK_M: actionCenter.fastGame(); break;
@@ -67,8 +70,7 @@ public class KeyListen {
 				case KeyEvent.VK_I: actionCenter.setTeamScore(); break;
 				case KeyEvent.VK_K: actionCenter.addToTeamScore(); break;
 				
-				// Cancel category selection
-				case KeyEvent.VK_ESCAPE: actionCenter.cancelCategorySelection(); break;
+				
 				}	
 			} break; // End mode SELECT
 			case BUZZ: {

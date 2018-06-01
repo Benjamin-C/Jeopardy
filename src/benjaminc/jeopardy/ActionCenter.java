@@ -5,6 +5,8 @@ import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.util.List;
 
+import javax.swing.plaf.synth.SynthSeparatorUI;
+
 public class ActionCenter {
 
 	// "Public" variables
@@ -13,11 +15,15 @@ public class ActionCenter {
 	private List<Team> teams;
 	private Game game;
 	
+	// Activate variables
+	private boolean beginWithoutAllActivations;
+	
 	// Utility variables
 	private Object sync;
 	
 	// Question selection variables
 	private Category selCat;
+	private int selQuesNum;
 	private Question selQues;
 	
 	// Team selection variables
@@ -32,6 +38,7 @@ public class ActionCenter {
 	private boolean isNumberNegitive;
 	public boolean isModifyAdditive;
 	private int num;
+	private String selNumLabel;
 	
 	// Double Jeopardy variables
 	int wager;
@@ -47,6 +54,7 @@ public class ActionCenter {
 		isNumberNegitive = false;
 		isModifyAdditive = false;
 		teamLast = teams.get(0);
+		beginWithoutAllActivations = false;
 	}
 	
 	//--------------------------------
@@ -121,30 +129,41 @@ public class ActionCenter {
 	 * @param num	The int number of the current category
 	 */
 	public void selectCategory(int num) {
-		selCat = cat.get(num);
-		gamePanel.selCat(num);
+		if(num >= 0 && num < cat.size()) {
+			selCat = cat.get(num);
+			gamePanel.selCat(num);
+		}
+	}
+	/**
+	 * Select which question is being used
+	 * 
+	 * @param num	The int number of the current question
+	 */
+	public void selectPoints(int p) {
+		selQuesNum = p;
+		gamePanel.selQues(p);
 	}
 	/**
 	 * Select which question is being used
 	 * 
 	 * @param p	The int number of the current question
 	 */
-	public void selectQuestion(int p) {
-		if(selCat != null) {
-			Question q = selCat.getQuestion(p);
+	public void selectQuestion() {
+		if(selCat != null && selQuesNum >= 0 && selQuesNum < selCat.size()) {
+			Question q = selCat.getQuestion(selQuesNum);
 			if(q.isUsed() == false) {
 				if(q.isDouble()) {
-					if(teamLast.getInputMode() != InputMode.APP) {
-						
+					gamePanel.displayText(teamLast.getName() + " team double amount:");
+					getDoubleAmount();
+				} else {
+					for(Team t : teams) {
+						t.setGuessed(false);
 					}
 				}
-			for(Team t : teams) {
-				t.setGuessed(false);
-			}
-			gamePanel.displayText(q.getQuestion());
-			q.setIsUsed(true);
-			selQues = q;
-			game.setMode(Mode.BUZZ);
+				gamePanel.displayText(q.getQuestion());
+				q.setIsUsed(true);
+				selQues = q;
+				game.setMode(Mode.BUZZ);
 			}
 		}
 	}
@@ -158,14 +177,25 @@ public class ActionCenter {
 	 * Gets the amount for Double Jeopardy
 	 */
 	public void getDoubleAmount() {
-		pickNumber( new Runnable() { @Override public void run() {
-			if(num <= teamLast.getScore()) {
-				if(num <= 0) { wager = num; } else {
+		System.out.println("IsDouble");
+		if(teamLast.getInputMode() == InputMode.APP) {
+			teamLast.setWager(teamLast.getDoubleAmount());
+			if(teamLast.getWager() <= teamLast.getScore()) {
+				if(teamLast.getWager() >= 0) { wager = teamLast.getWager(); } else {
 					System.out.println("Need bigger than 0"); getDoubleAmount();
 			} } else {
-				System.out.println("Must be less than team score"); getDoubleAmount();}
+				System.out.println("Must be less than team score"); getDoubleAmount();
 			}
-		}, new Runnable() {@Override public void run() { getDoubleAmount();} });
+		} else {
+			pickNumber( new Runnable() { @Override public void run() {
+				if(num <= teamLast.getScore()) {
+					if(num >= 0) { wager = num; } else {
+						System.out.println("Need bigger than 0"); getDoubleAmount();
+				} } else {
+					System.out.println("Must be less than team score"); getDoubleAmount();}
+				}
+			}, new Runnable() {@Override public void run() { getDoubleAmount();} }, "Wager");
+		}
 	}
 	
 	//--------------------------------
@@ -181,14 +211,17 @@ public class ActionCenter {
 	 * 
 	 * @param whenDone	The Runnable that is run when the number is selected
 	 * @param whenCancel	The Runnable that is run when the selection is canceled
+	 * @param label		What to show at the top of the screen
 	 */
-	private void pickNumber(Runnable whenDone, Runnable whenCancel) {
+	private void pickNumber(Runnable whenDone, Runnable whenCancel, String label) {
 		whenNumberSelectionDone = whenDone;
 		whenNumberSelectionCancel = whenCancel;
 		isNumberNegitive = false;
 		System.out.println("Getting number");
-		game.setMode(Mode.PICK_NUMBER);
 		num = 0;
+		selNumLabel = label;
+		gamePanel.displayText(selNumLabel + " \n" + num);
+		game.setMode(Mode.PICK_NUMBER);
 	}
 	/**
 	 * Select the next digit in the number selection
@@ -207,9 +240,9 @@ public class ActionCenter {
 			n = "-";
 		}
 		System.out.println(n + num);
-		gamePanel.displayText(teamMod.getName() + ": \n" + n + num, teamMod.getColor());
+		gamePanel.displayText(selNumLabel + "\n" + n + num, teamMod.getColor());
 		if(game.getMode() == Mode.WAGER) {
-			gamePanel.displayText(teamSel.getName() + " Team\n" + num);
+			gamePanel.displayText(selNumLabel + " \n" + num);
 		}
 	}
 	/**
@@ -245,7 +278,7 @@ public class ActionCenter {
 		teamMod = teams.get(n);
 		gamePanel.displayText(teamMod.getName() + ": \n", teamMod.getColor());
 		pickNumber( new Runnable() { @Override public void run() { if(isModifyAdditive) { teamMod.setScore(teamMod.getScore() + num);} else {teamMod.setScore(num); } game.setMode(Mode.SELECT); gamePanel.drawMainPanel(); } },
-				new Runnable() {@Override public void run() { game.setMode(Mode.SELECT); gamePanel.drawMainPanel();} });
+				new Runnable() {@Override public void run() { game.setMode(Mode.SELECT); gamePanel.drawMainPanel();} }, teamMod.getName());
 	}
 	/**
 	 * Cancel selecting the buzzing team selection and return to the selection panel
@@ -302,7 +335,11 @@ public class ActionCenter {
 	 */
 	public void teamAnsworedCorrectly() {
 		gamePanel.displayText(selQues.getAnswer()); // Show answer
-		teamAns.addScore(selQues.getScore());
+		if(selQues.isDouble()) {
+			teamLast.addScore(wager);
+		} else {
+			teamAns.addScore(selQues.getScore());
+		}
 		game.setMode(Mode.SHOW_CORRECT);
 		teamLast = teamAns;
 	}
@@ -311,7 +348,11 @@ public class ActionCenter {
 	 */
 	public void teamAnsworedIncorrectly() {
 		teamAns.setGuessed(true);
-		teamAns.addScore(selQues.getScore() * -1);
+		if(selQues.isDouble()) {
+			teamLast.addScore(wager * -1);
+		} else {
+			teamAns.addScore(selQues.getScore() * -1);
+		}
 		boolean done = true;
 		for(Team t : teams) {
 			if(!t.hasGuessed()) {
@@ -403,18 +444,26 @@ public class ActionCenter {
 		gamePanel.show4Parts(parts[0], parts[1], parts[2], parts[3]);
 		Util.resume(sync);
 	}
+	public void activateAll() {
+		beginWithoutAllActivations = true;
+		Util.resume(sync);
+	}
 	/**
 	 * Find out if all teams have activated
-	 * @return boolean if all teams have buzzed
+	 * @return boolean if all teams have activated
 	 */
 	public boolean hasEveryoneActivated() {
-		boolean isdone = true;
-		for(Team t : teams) {
-			if(!t.hasGuessed()) {
-				//System.out.println(t + " " + t.hasGuessed());
-				isdone = false;
+		if(beginWithoutAllActivations) {
+			return true;
+		} else {
+			boolean isdone = true;
+			for(Team t : teams) {
+				System.out.println(t.getName() + " " + t.getServer());
+				if(t.getServer() == null) {
+					isdone = false;
+				}
 			}
+			return isdone;
 		}
-		return isdone;
 	}
 }

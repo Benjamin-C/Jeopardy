@@ -16,7 +16,7 @@ public class Main {
 	
 	public static void main(String args[]) {
 		System.out.println("Jeopardy");
-		Game game = new Game(InputMode.APP);
+		Game game = new Game(InputMode.KEYBOARD);
 		game.begin();
 	}
 	
