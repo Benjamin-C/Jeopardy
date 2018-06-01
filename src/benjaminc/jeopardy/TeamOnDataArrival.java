@@ -1,6 +1,7 @@
 package benjaminc.jeopardy;
 
 import benjamin.BenTCP.TCPOnDataArrival;
+import benjaminc.util.Util;
 
 public class TeamOnDataArrival implements TCPOnDataArrival{
 

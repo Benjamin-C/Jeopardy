@@ -1,4 +1,4 @@
-package benjaminc.jeopardy;
+package benjaminc.util;
 
 import java.util.Set;
 

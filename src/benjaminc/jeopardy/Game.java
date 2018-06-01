@@ -17,6 +17,8 @@ import java.util.Scanner;
 
 import javax.swing.JFrame;
 import benjamin.BenTCP.*;
+import benjaminc.util.TracedPrintStream;
+import benjaminc.util.Util;
 
 public class Game {
 	private GamePanel gamePanel;
@@ -48,7 +50,7 @@ public class Game {
 		System.out.println("logname = " + dateFormat.format(cal) + ".txt"); //2016/11/16 12:08:43
 		try { logPrintStream = new PrintStream("logs/" + dateFormat.format(cal) + ".txt"); } catch (FileNotFoundException e1) { e1.printStackTrace(); }
 		outputPrintStream = new PrintStreamDuplicator(logPrintStream, System.out);
-		tracedPrintStream = new TracedPrintStream(outputPrintStream);
+		tracedPrintStream = new TracedPrintStream(outputPrintStream, true);
 		System.setOut(tracedPrintStream);
 		System.setErr(outputPrintStream);
 		
@@ -57,10 +59,10 @@ public class Game {
 				
 		// Set up teams
 		teams = new ArrayList<Team>();
-		teams.add(new Team(Color.RED, "Red", null));
-		teams.add(new Team(Color.YELLOW, "Yellow", null));
-		teams.add(new Team(Color.GREEN, "Green", null));
-		teams.add(new Team(Color.CYAN, "Blue", null));
+		teams.add(new Team(actionCenter, Color.RED, "Red", null));
+		teams.add(new Team(actionCenter, Color.YELLOW, "Yellow", null));
+		teams.add(new Team(actionCenter, Color.GREEN, "Green", null));
+		teams.add(new Team(actionCenter, Color.CYAN, "Blue", null));
 		
 		// Make the JFrame to see things
 		jf = new JFrame();
@@ -182,5 +184,6 @@ public class Game {
 	
 	public void setMode(Mode m) {
 		mode = m;
+		System.out.println("Setting mode to " + m);
 	}
 }

@@ -3,6 +3,7 @@ package benjaminc.jeopardy;
 import java.awt.Color;
 
 import benjamin.BenTCP.TCPServer;
+import benjaminc.util.Util;
 
 public class Team {
 	private int score;
@@ -13,20 +14,21 @@ public class Team {
 	private String name;
 	private int wager;
 	private Object syncObj;
+	private ActionCenter actionCenter;
 
 	private TCPServer server;
 
 	private InputMode inputMode;
 	
-	public Team() {
-		this(Color.BLUE, "", null);
+	public Team(ActionCenter ac) {
+		this(ac, Color.BLUE, "", null);
 	}
 	
-	public Team(Color c, InputMode im) {
-		this(c, "", im);
+	public Team(ActionCenter ac, Color c, InputMode im) {
+		this(ac, c, "", im);
 	}
 	
-	public Team(Color c, String n, InputMode im) {
+	public Team(ActionCenter ac, Color c, String n, InputMode im) {
 		score = 0;
 		didGuess = false;
 		color = c;
@@ -34,6 +36,7 @@ public class Team {
 		name = n;
 		inputMode = im;
 		syncObj = new Object();
+		actionCenter = ac;
 	}
 	
 	public String getName() {
@@ -76,11 +79,19 @@ public class Team {
 		wager = w;
 	}
 	
-	public int getDoubleAmount() {
+	public int getNumber() {
 		if(inputMode == InputMode.APP) {
 			wager = -2;
-			Util.pause(syncObj);
+		} else {
+			actionCenter.pickNumber(new PickNumberCallback() {
+				@Override public void whenDone(int n) { wager = n; }
+				@Override public void whenCanceled() { } },
+				name + " Team Wager:\n"
+			);
 		}
+		System.out.println("Pausing ...");
+		Util.pause(syncObj);
+		System.out.println("Done pausing");
 		return wager;
 	}
 	

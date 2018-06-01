@@ -7,6 +7,8 @@ import java.util.List;
 
 import javax.swing.plaf.synth.SynthSeparatorUI;
 
+import benjaminc.util.Util;
+
 public class ActionCenter {
 
 	// "Public" variables
@@ -33,12 +35,12 @@ public class ActionCenter {
 	private Team teamLast;
 	
 	// Number Selection variables
-	private Runnable whenNumberSelectionDone;
-	private Runnable whenNumberSelectionCancel;
+	private PickNumberCallback pickNumberCallback;
 	private boolean isNumberNegitive;
 	public boolean isModifyAdditive;
 	private int num;
 	private String selNumLabel;
+	private Object pickNumberWaiter;
 	
 	// Double Jeopardy variables
 	int wager;
@@ -55,6 +57,7 @@ public class ActionCenter {
 		isModifyAdditive = false;
 		teamLast = teams.get(0);
 		beginWithoutAllActivations = false;
+		pickNumberWaiter = new Object();
 	}
 	
 	//--------------------------------
@@ -179,7 +182,7 @@ public class ActionCenter {
 	public void getDoubleAmount() {
 		System.out.println("IsDouble");
 		if(teamLast.getInputMode() == InputMode.APP) {
-			teamLast.setWager(teamLast.getDoubleAmount());
+			teamLast.setWager(teamLast.getNumber());
 			if(teamLast.getWager() <= teamLast.getScore()) {
 				if(teamLast.getWager() >= 0) { wager = teamLast.getWager(); } else {
 					System.out.println("Need bigger than 0"); getDoubleAmount();
@@ -187,14 +190,17 @@ public class ActionCenter {
 				System.out.println("Must be less than team score"); getDoubleAmount();
 			}
 		} else {
-			pickNumber( new Runnable() { @Override public void run() {
-				if(num <= teamLast.getScore()) {
-					if(num >= 0) { wager = num; } else {
-						System.out.println("Need bigger than 0"); getDoubleAmount();
-				} } else {
-					System.out.println("Must be less than team score"); getDoubleAmount();}
-				}
-			}, new Runnable() {@Override public void run() { getDoubleAmount();} }, "Wager");
+			pickNumber( new PickNumberCallback() { 
+				@Override public void whenDone(int n) {
+					if(n <= teamLast.getScore()) {
+						if(n >= 0) { wager = n; } else {
+							System.out.println("Need bigger than 0"); getDoubleAmount();
+					} } else {
+						System.out.println("Must be less than team score"); getDoubleAmount();}
+					}
+				@Override public void whenCanceled() { getDoubleAmount();} },
+				"Wager"
+			);
 		}
 	}
 	
@@ -213,9 +219,8 @@ public class ActionCenter {
 	 * @param whenCancel	The Runnable that is run when the selection is canceled
 	 * @param label		What to show at the top of the screen
 	 */
-	private void pickNumber(Runnable whenDone, Runnable whenCancel, String label) {
-		whenNumberSelectionDone = whenDone;
-		whenNumberSelectionCancel = whenCancel;
+	public void pickNumber(PickNumberCallback pnc, String label) {
+		pickNumberCallback = pnc;
 		isNumberNegitive = false;
 		System.out.println("Getting number");
 		num = 0;
@@ -250,15 +255,15 @@ public class ActionCenter {
 	 */
 	public void finializeNumberSelection() {
 		if(isNumberNegitive) {
-						num = num * -1;
-					}
-					whenNumberSelectionDone.run();
+			num = num * -1;
+		}
+		pickNumberCallback.whenDone(num);
 	}
 	/**
 	 * Cancel the selection of the number, run the whenCancel runnable
 	 */
 	public void cancelNumberSelection() {
-		whenNumberSelectionCancel.run();
+		pickNumberCallback.whenCanceled();
 	}
 	
 	//--------------------------------
@@ -277,8 +282,11 @@ public class ActionCenter {
 	public void selectModTeam(int n) {
 		teamMod = teams.get(n);
 		gamePanel.displayText(teamMod.getName() + ": \n", teamMod.getColor());
-		pickNumber( new Runnable() { @Override public void run() { if(isModifyAdditive) { teamMod.setScore(teamMod.getScore() + num);} else {teamMod.setScore(num); } game.setMode(Mode.SELECT); gamePanel.drawMainPanel(); } },
-				new Runnable() {@Override public void run() { game.setMode(Mode.SELECT); gamePanel.drawMainPanel();} }, teamMod.getName());
+		pickNumber( new PickNumberCallback() {
+			@Override public void whenDone(int n) { if(isModifyAdditive) { teamMod.setScore(teamMod.getScore() + n);} else {teamMod.setScore(n); } game.setMode(Mode.SELECT); gamePanel.drawMainPanel(); }
+			@Override public void whenCanceled() { game.setMode(Mode.SELECT); gamePanel.drawMainPanel();} },
+			teamMod.getName()
+		);
 	}
 	/**
 	 * Cancel selecting the buzzing team selection and return to the selection panel
