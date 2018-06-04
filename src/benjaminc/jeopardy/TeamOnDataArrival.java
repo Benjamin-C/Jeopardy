@@ -7,7 +7,8 @@ public class TeamOnDataArrival implements TCPOnDataArrival{
 
 	private int num;
 	private ActionCenter actionCenter;
-	Team team;
+	private Team team;
+	private PickNumberCallback numberCallback;
 	
 	public TeamOnDataArrival(int num, ActionCenter actionCenter, Team t) {
 		this.num = num;
@@ -23,8 +24,8 @@ public class TeamOnDataArrival implements TCPOnDataArrival{
 				actionCenter.buzz(num);
 				System.out.println("Buzzing " + num);
 			} break;
-			case 0x30: {// Wager {
-				if(team.getWager() == -2) {
+			case 0x30: {// Wager
+				if(numberCallback != null) {
 					System.out.println("odr" + data[0] + " " + data[1] + " " + data[2]);
 					if(data.length >= 3) {
 						int temp = 0;
@@ -32,13 +33,18 @@ public class TeamOnDataArrival implements TCPOnDataArrival{
 						temp = temp << 8;
 						temp = temp + (data[2] & 0xFF);
 						System.out.println(temp);
-						team.setWager(temp);
-						Util.resume(team.getSyncObject());
+						numberCallback.whenDone(temp);
+					} else {
+						numberCallback.whenCanceled();
 					}
 				}
 			}
 			}
 		}
+	}
+	
+	public void pickNumber(PickNumberCallback pncb) {
+		numberCallback = pncb;
 	}
 
 }

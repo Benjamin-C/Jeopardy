@@ -20,15 +20,17 @@ public class Team {
 
 	private InputMode inputMode;
 	
-	public Team(ActionCenter ac) {
-		this(ac, Color.BLUE, "", null);
+	private TeamOnDataArrival onDataArrival;
+
+	public Team(ActionCenter ac, TeamOnDataArrival odr) {
+		this(ac, odr, Color.BLUE, "", null);
 	}
 	
-	public Team(ActionCenter ac, Color c, InputMode im) {
-		this(ac, c, "", im);
+	public Team(ActionCenter ac, TeamOnDataArrival odr, Color c, InputMode im) {
+		this(ac, odr, c, "", im);
 	}
 	
-	public Team(ActionCenter ac, Color c, String n, InputMode im) {
+	public Team(ActionCenter ac, TeamOnDataArrival odr, Color c, String n, InputMode im) {
 		score = 0;
 		didGuess = false;
 		color = c;
@@ -37,6 +39,7 @@ public class Team {
 		inputMode = im;
 		syncObj = new Object();
 		actionCenter = ac;
+		onDataArrival = odr;
 	}
 	
 	public String getName() {
@@ -79,20 +82,25 @@ public class Team {
 		wager = w;
 	}
 	
-	public int getNumber() {
+	public TeamOnDataArrival getOnDataArrival() {
+		return onDataArrival;
+	}
+
+	public void setOnDataArrival(TeamOnDataArrival onDataArrival) {
+		this.onDataArrival = onDataArrival;
+	}
+	
+	public void getNumber(PickNumberCallback pnc) {
 		if(inputMode == InputMode.APP) {
-			wager = -2;
+			onDataArrival.pickNumber(pnc);
 		} else {
+			System.out.println("Picking num");
 			actionCenter.pickNumber(new PickNumberCallback() {
-				@Override public void whenDone(int n) { wager = n; }
-				@Override public void whenCanceled() { } },
-				name + " Team Wager:\n"
+				@Override public void whenDone(int n) { pnc.whenDone(n); }
+				@Override public void whenCanceled() { pnc.whenCanceled(); } },
+				name + " Team Wager:\n", color
 			);
 		}
-		System.out.println("Pausing ...");
-		Util.pause(syncObj);
-		System.out.println("Done pausing");
-		return wager;
 	}
 	
 	public InputMode getInputMode() {

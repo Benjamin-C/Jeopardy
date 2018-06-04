@@ -1,5 +1,6 @@
 package benjaminc.jeopardy;
 
+import java.awt.Color;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
@@ -41,6 +42,7 @@ public class ActionCenter {
 	private int num;
 	private String selNumLabel;
 	private Object pickNumberWaiter;
+	private Color teamModColor;
 	
 	// Double Jeopardy variables
 	int wager;
@@ -157,18 +159,27 @@ public class ActionCenter {
 			if(q.isUsed() == false) {
 				if(q.isDouble()) {
 					gamePanel.displayText(teamLast.getName() + " team double amount:");
-					getDoubleAmount();
+					System.out.println("Get double");
+					getDoubleAmount(q);
 				} else {
 					for(Team t : teams) {
 						t.setGuessed(false);
 					}
+					gamePanel.displayText(q.getQuestion());
+					q.setIsUsed(true);
+					selQues = q;
+					game.setMode(Mode.BUZZ);
 				}
-				gamePanel.displayText(q.getQuestion());
-				q.setIsUsed(true);
-				selQues = q;
-				game.setMode(Mode.BUZZ);
+				
 			}
 		}
+	}
+	private void afterDouble(Question q) {
+		gamePanel.displayText(q.getQuestion());
+		q.setIsUsed(true);
+		selQues = q;
+		buzz(teamLast.getNum());
+		game.setMode(Mode.ANSWER);
 	}
 	/**
 	 * Cancel the category selection
@@ -179,28 +190,28 @@ public class ActionCenter {
 	/**
 	 * Gets the amount for Double Jeopardy
 	 */
-	public void getDoubleAmount() {
+	public void getDoubleAmount(Question q) {
+		PickNumberCallback pickNumberCallback = new PickNumberCallback() { 
+			@Override public void whenDone(int n) {
+				if(n <= teamLast.getScore()) {
+					if(n >= 0) { wager = n; afterDouble(q); } else {
+						System.out.println("Need bigger than 0"); getDoubleAmount(q);
+				} } else {
+					System.out.println("Must be less than team score"); getDoubleAmount(q);}
+				}
+			@Override public void whenCanceled() { getDoubleAmount(q);} };
+			
 		System.out.println("IsDouble");
 		if(teamLast.getInputMode() == InputMode.APP) {
-			teamLast.setWager(teamLast.getNumber());
+			teamLast.getNumber(pickNumberCallback);
 			if(teamLast.getWager() <= teamLast.getScore()) {
 				if(teamLast.getWager() >= 0) { wager = teamLast.getWager(); } else {
-					System.out.println("Need bigger than 0"); getDoubleAmount();
+					System.out.println("Need bigger than 0"); getDoubleAmount(q);
 			} } else {
-				System.out.println("Must be less than team score"); getDoubleAmount();
+				System.out.println("Must be less than team score"); getDoubleAmount(q);
 			}
 		} else {
-			pickNumber( new PickNumberCallback() { 
-				@Override public void whenDone(int n) {
-					if(n <= teamLast.getScore()) {
-						if(n >= 0) { wager = n; } else {
-							System.out.println("Need bigger than 0"); getDoubleAmount();
-					} } else {
-						System.out.println("Must be less than team score"); getDoubleAmount();}
-					}
-				@Override public void whenCanceled() { getDoubleAmount();} },
-				"Wager"
-			);
+			pickNumber( pickNumberCallback , "Wager" , teamLast.getColor());
 		}
 	}
 	
@@ -219,7 +230,7 @@ public class ActionCenter {
 	 * @param whenCancel	The Runnable that is run when the selection is canceled
 	 * @param label		What to show at the top of the screen
 	 */
-	public void pickNumber(PickNumberCallback pnc, String label) {
+	public void pickNumber(PickNumberCallback pnc, String label, Color c) {
 		pickNumberCallback = pnc;
 		isNumberNegitive = false;
 		System.out.println("Getting number");
@@ -227,6 +238,7 @@ public class ActionCenter {
 		selNumLabel = label;
 		gamePanel.displayText(selNumLabel + " \n" + num);
 		game.setMode(Mode.PICK_NUMBER);
+		teamModColor = c;
 	}
 	/**
 	 * Select the next digit in the number selection
@@ -245,7 +257,7 @@ public class ActionCenter {
 			n = "-";
 		}
 		System.out.println(n + num);
-		gamePanel.displayText(selNumLabel + "\n" + n + num, teamMod.getColor());
+		gamePanel.displayText(selNumLabel + "\n" + n + num, teamModColor);
 		if(game.getMode() == Mode.WAGER) {
 			gamePanel.displayText(selNumLabel + " \n" + num);
 		}
@@ -285,7 +297,7 @@ public class ActionCenter {
 		pickNumber( new PickNumberCallback() {
 			@Override public void whenDone(int n) { if(isModifyAdditive) { teamMod.setScore(teamMod.getScore() + n);} else {teamMod.setScore(n); } game.setMode(Mode.SELECT); gamePanel.drawMainPanel(); }
 			@Override public void whenCanceled() { game.setMode(Mode.SELECT); gamePanel.drawMainPanel();} },
-			teamMod.getName()
+			teamMod.getName(), teamMod.getColor()
 		);
 	}
 	/**
@@ -344,7 +356,7 @@ public class ActionCenter {
 	public void teamAnsworedCorrectly() {
 		gamePanel.displayText(selQues.getAnswer()); // Show answer
 		if(selQues.isDouble()) {
-			teamLast.addScore(wager);
+			teamLast.addScore(teamLast.getWager());
 		} else {
 			teamAns.addScore(selQues.getScore());
 		}
@@ -358,6 +370,8 @@ public class ActionCenter {
 		teamAns.setGuessed(true);
 		if(selQues.isDouble()) {
 			teamLast.addScore(wager * -1);
+			gamePanel.displayText(selQues.getAnswer());
+			game.setMode(Mode.SHOW_CORRECT);
 		} else {
 			teamAns.addScore(selQues.getScore() * -1);
 		}
