@@ -127,7 +127,7 @@ public class Game {
 	public void begin() {
 		gamePanel.displayText("Jeopardy");
 		keyListen.enable();
-		Thread t = new Thread() {
+		Thread t = new Thread("RoundSelector") {
 			Object sync = new Object();
 			public void run() {
 				setMode(Mode.INIT);

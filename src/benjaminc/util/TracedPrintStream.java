@@ -81,7 +81,7 @@ public class TracedPrintStream extends PrintStream{
 					st = st + "(" + filename.substring(0,  filename.lastIndexOf('.')) + ":" + (Thread.currentThread().getStackTrace()[i].getLineNumber()) + ")>";
 				}
 			}
-			return st + " " + loc.getClassName() + "." + loc.getMethodName() + "(" + loc.getFileName() + ":" + (loc.getLineNumber() + rel) + ")";
+			return Thread.currentThread().getName() + " " + st + " " + loc.getClassName() + "." + loc.getMethodName() + "(" + loc.getFileName() + ":" + (loc.getLineNumber() + rel) + ")";
 		} else {
 			return loc.getClassName() + "." + loc.getMethodName() + "(" + loc.getFileName() + ":" + (loc.getLineNumber() + rel) + ")";
 		}

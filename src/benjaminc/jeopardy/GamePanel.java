@@ -59,6 +59,7 @@ public class GamePanel{
 	
 	@SuppressWarnings("serial")
 	public boolean drawMainPanel(List<Category> cat) {
+		System.out.println("Drawing main panel");
 		categories = cat;
 		panel = new JPanel() {
 			@Override
@@ -152,6 +153,15 @@ public class GamePanel{
 	
 	@SuppressWarnings("serial")
 	public boolean displayText(String text, Color c) {
+		String tempTextForPrinting = text;
+		if(tempTextForPrinting.contains("\n")) {
+			for(int i = 0; i < tempTextForPrinting.length(); i++) {
+				if(tempTextForPrinting.charAt(i) == '\n') {
+					tempTextForPrinting = tempTextForPrinting.substring(0,  i - 1) + "\\n" + tempTextForPrinting.substring(i);
+				}
+			}
+		}
+		System.out.println("Showing text: " + tempTextForPrinting);
 		if(text.equals(null)) {
 			return false;
 		}

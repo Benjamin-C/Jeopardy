@@ -58,7 +58,7 @@ public class KeyListen {
 				case KeyEvent.VK_G: actionCenter.selectPoints(4); break;
 				
 				// Select the question
-				case KeyEvent.VK_ENTER: actionCenter.selectQuestion();
+				case KeyEvent.VK_ENTER: actionCenter.selectQuestion(); break;
 				
 				// Cancel category selection
 				case KeyEvent.VK_ESCAPE: actionCenter.cancelCategorySelection(); break;// Cancel selection
@@ -69,7 +69,6 @@ public class KeyListen {
 				// Set Team Score
 				case KeyEvent.VK_I: actionCenter.setTeamScore(); break;
 				case KeyEvent.VK_K: actionCenter.addToTeamScore(); break;
-				
 				
 				}	
 			} break; // End mode SELECT
