@@ -76,10 +76,10 @@ public class KeyListen {
 				if(mayBuzzByKeyboard) {
 					switch(key) {
 					// Happens when a team buzzes in
-					case KeyEvent.VK_F5: actionCenter.buzz(0); break;
-					case KeyEvent.VK_F6: actionCenter.buzz(1); break;
-					case KeyEvent.VK_F7: actionCenter.buzz(2); break;
-					case KeyEvent.VK_F8: actionCenter.buzz(3); break;
+					case KeyEvent.VK_F5: game.getTeams().get(0).buzz(); break;
+					case KeyEvent.VK_F6: game.getTeams().get(1).buzz(); break;
+					case KeyEvent.VK_F7: game.getTeams().get(2).buzz(); break;
+					case KeyEvent.VK_F8: game.getTeams().get(3).buzz(); break;
 					}
 				}
 				//Cancel team selection

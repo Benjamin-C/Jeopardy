@@ -4,7 +4,6 @@ import java.awt.Color;
 
 import benjamin.BenTCP.TCPOnDataArrival;
 import benjamin.BenTCP.TCPServer;
-import benjaminc.util.Util;
 
 public class Team implements TCPOnDataArrival{
 	private int score;
@@ -87,6 +86,7 @@ public class Team implements TCPOnDataArrival{
 			pickNumber(pnc);
 		} else {
 			System.out.println("Picking num");
+			System.out.println(actionCenter + " " + pnc + " " + name + " " + color);
 			actionCenter.pickNumber(new PickNumberCallback() {
 				@Override public void whenDone(int n) { pnc.whenDone(n); }
 				@Override public void whenCanceled() { pnc.whenCanceled(); } },
@@ -120,7 +120,7 @@ public class Team implements TCPOnDataArrival{
 		if(data.length > 0) {
 			switch(data[0]) {
 			case 0x50: {// Buzz
-				actionCenter.buzz(num);
+				buzz();
 				System.out.println("Buzzing " + num);
 			} break;
 			case 0x30: {// Wager
@@ -136,6 +136,7 @@ public class Team implements TCPOnDataArrival{
 					} else {
 						numberCallback.whenCanceled();
 					}
+					numberCallback = null;
 				}
 			}
 			}
@@ -143,6 +144,14 @@ public class Team implements TCPOnDataArrival{
 	}
 	
 	public void pickNumber(PickNumberCallback pncb) {
-		numberCallback = pncb;
+		if(inputMode != InputMode.APP) {
+			actionCenter.pickNumber(pncb,  name,  color);
+		} else {
+			numberCallback = pncb;
+		}
+	}
+	
+	public void buzz() {
+		actionCenter.buzz(this);
 	}
 }

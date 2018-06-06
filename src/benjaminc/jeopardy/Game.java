@@ -59,10 +59,7 @@ public class Game {
 				
 		// Set up teams
 		teams = new ArrayList<Team>();
-		teams.add(new Team(actionCenter, Color.RED, "Red", null));
-		teams.add(new Team(actionCenter, Color.YELLOW, "Yellow", null));
-		teams.add(new Team(actionCenter, Color.GREEN, "Green", null));
-		teams.add(new Team(actionCenter, Color.CYAN, "Blue", null));
+		System.out.println(actionCenter);
 		
 		// Make the JFrame to see things
 		jf = new JFrame();
@@ -74,6 +71,12 @@ public class Game {
 		gamePanel = new GamePanel(jf, teams);
 		actionCenter = new ActionCenter(gamePanel, this, teams);
 		keyListen = new KeyListen(this, actionCenter);
+		
+		// Set up teams
+		teams.add(new Team(actionCenter, Color.RED, "Red", null));
+		teams.add(new Team(actionCenter, Color.YELLOW, "Yellow", null));
+		teams.add(new Team(actionCenter, Color.GREEN, "Green", null));
+		teams.add(new Team(actionCenter, Color.CYAN, "Blue", null));
 		
 		// Setup input modes
 		switch(inputMode) {
@@ -185,5 +188,9 @@ public class Game {
 	public void setMode(Mode m) {
 		mode = m;
 		System.out.println("Setting mode to " + m);
+	}
+	
+	public List<Team> getTeams() {
+		return teams;
 	}
 }

@@ -3,10 +3,7 @@ package benjaminc.jeopardy;
 import java.awt.Color;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
-import java.security.GeneralSecurityException;
 import java.util.List;
-
-import javax.swing.plaf.synth.SynthSeparatorUI;
 
 import benjaminc.util.Util;
 
@@ -30,7 +27,6 @@ public class ActionCenter {
 	private Question selQues;
 	
 	// Team selection variables
-	private Team teamSel;
 	private Team teamMod;
 	private Team teamAns;
 	private Team teamLast;
@@ -41,7 +37,6 @@ public class ActionCenter {
 	public boolean isModifyAdditive;
 	private int num;
 	private String selNumLabel;
-	private Object pickNumberWaiter;
 	private Color teamModColor;
 	
 	// Double Jeopardy variables
@@ -49,7 +44,6 @@ public class ActionCenter {
 	
 	public ActionCenter(GamePanel gp, Game g, List<Team> team) {	
 		num = 0;
-		teamSel = null;
 		teamAns = null;
 		teamMod = null;
 		gamePanel = gp;
@@ -57,9 +51,8 @@ public class ActionCenter {
 		teams = team;
 		isNumberNegitive = false;
 		isModifyAdditive = false;
-		teamLast = teams.get(0);
+
 		beginWithoutAllActivations = false;
-		pickNumberWaiter = new Object();
 	}
 	
 	//--------------------------------
@@ -75,6 +68,7 @@ public class ActionCenter {
 	 * Begin the game
 	 */
 	public void begin() {
+		teamLast = teams.get(0);
 		Util.resume(sync);
 	}
 	/**
@@ -178,7 +172,7 @@ public class ActionCenter {
 		gamePanel.displayText(q.getQuestion());
 		q.setIsUsed(true);
 		selQues = q;
-		buzz(teamLast.getNum());
+		buzz(teamLast);
 		game.setMode(Mode.ANSWER);
 	}
 	/**
@@ -202,16 +196,13 @@ public class ActionCenter {
 			@Override public void whenCanceled() { getDoubleAmount(q);} };
 			
 		System.out.println("IsDouble");
-		if(teamLast.getInputMode() == InputMode.APP) {
-			teamLast.getNumber(pickNumberCallback);
-			if(teamLast.getWager() <= teamLast.getScore()) {
-				if(teamLast.getWager() >= 0) { wager = teamLast.getWager(); } else {
-					System.out.println("Need bigger than 0"); getDoubleAmount(q);
-			} } else {
-				System.out.println("Must be less than team score"); getDoubleAmount(q);
-			}
-		} else {
-			pickNumber( pickNumberCallback , "Wager" , teamLast.getColor());
+		System.out.println(pickNumberCallback);
+		teamLast.getNumber(pickNumberCallback);
+		if(teamLast.getWager() <= teamLast.getScore()) {
+			if(teamLast.getWager() >= 0) { wager = teamLast.getWager(); } else {
+				System.out.println("Need bigger than 0"); getDoubleAmount(q);
+		} } else {
+			System.out.println("Must be less than team score"); getDoubleAmount(q);
 		}
 	}
 	
@@ -423,10 +414,9 @@ public class ActionCenter {
 	 * 
 	 * @param n		The int number of the team
 	 */
-	public void buzz(int n) {
-		Team t = teams.get(n);
-		gamePanel.displayText(selQues.getQuestion(), t.getColor());
+	public void buzz(Team t) {
 		teamAns = t;
+		gamePanel.displayText(selQues.getQuestion(), t.getColor());
 		game.setMode(Mode.ANSWER);
 	}
 	
