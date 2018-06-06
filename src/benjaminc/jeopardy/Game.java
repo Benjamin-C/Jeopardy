@@ -59,10 +59,10 @@ public class Game {
 				
 		// Set up teams
 		teams = new ArrayList<Team>();
-		teams.add(new Team(actionCenter, null, Color.RED, "Red", null));
-		teams.add(new Team(actionCenter, null, Color.YELLOW, "Yellow", null));
-		teams.add(new Team(actionCenter, null, Color.GREEN, "Green", null));
-		teams.add(new Team(actionCenter, null, Color.CYAN, "Blue", null));
+		teams.add(new Team(actionCenter, Color.RED, "Red", null));
+		teams.add(new Team(actionCenter, Color.YELLOW, "Yellow", null));
+		teams.add(new Team(actionCenter, Color.GREEN, "Green", null));
+		teams.add(new Team(actionCenter, Color.CYAN, "Blue", null));
 		
 		// Make the JFrame to see things
 		jf = new JFrame();

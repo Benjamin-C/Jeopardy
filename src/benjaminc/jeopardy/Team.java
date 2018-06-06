@@ -2,10 +2,11 @@ package benjaminc.jeopardy;
 
 import java.awt.Color;
 
+import benjamin.BenTCP.TCPOnDataArrival;
 import benjamin.BenTCP.TCPServer;
 import benjaminc.util.Util;
 
-public class Team {
+public class Team implements TCPOnDataArrival{
 	private int score;
 	private boolean didGuess;
 	private Color color;
@@ -20,17 +21,17 @@ public class Team {
 
 	private InputMode inputMode;
 	
-	private TeamOnDataArrival onDataArrival;
+	private PickNumberCallback numberCallback;
 
-	public Team(ActionCenter ac, TeamOnDataArrival odr) {
-		this(ac, odr, Color.BLUE, "", null);
+	public Team(ActionCenter ac) {
+		this(ac, Color.BLUE, "", null);
 	}
 	
-	public Team(ActionCenter ac, TeamOnDataArrival odr, Color c, InputMode im) {
-		this(ac, odr, c, "", im);
+	public Team(ActionCenter ac, Color c, InputMode im) {
+		this(ac, c, "", im);
 	}
 	
-	public Team(ActionCenter ac, TeamOnDataArrival odr, Color c, String n, InputMode im) {
+	public Team(ActionCenter ac, Color c, String n, InputMode im) {
 		score = 0;
 		didGuess = false;
 		color = c;
@@ -39,7 +40,6 @@ public class Team {
 		inputMode = im;
 		syncObj = new Object();
 		actionCenter = ac;
-		onDataArrival = odr;
 	}
 	
 	public String getName() {
@@ -82,17 +82,9 @@ public class Team {
 		wager = w;
 	}
 	
-	public TeamOnDataArrival getOnDataArrival() {
-		return onDataArrival;
-	}
-
-	public void setOnDataArrival(TeamOnDataArrival onDataArrival) {
-		this.onDataArrival = onDataArrival;
-	}
-	
 	public void getNumber(PickNumberCallback pnc) {
 		if(inputMode == InputMode.APP) {
-			onDataArrival.pickNumber(pnc);
+			pickNumber(pnc);
 		} else {
 			System.out.println("Picking num");
 			actionCenter.pickNumber(new PickNumberCallback() {
@@ -122,5 +114,35 @@ public class Team {
 	public Object getSyncObject() {
 		return syncObj;
 	}
-
+	
+	@Override
+	public void onDataArrived(byte[] data) {
+		if(data.length > 0) {
+			switch(data[0]) {
+			case 0x50: {// Buzz
+				actionCenter.buzz(num);
+				System.out.println("Buzzing " + num);
+			} break;
+			case 0x30: {// Wager
+				if(numberCallback != null) {
+					System.out.println("odr" + data[0] + " " + data[1] + " " + data[2]);
+					if(data.length >= 3) {
+						int temp = 0;
+						temp = data[1] & 0xff;
+						temp = temp << 8;
+						temp = temp + (data[2] & 0xFF);
+						System.out.println(temp);
+						numberCallback.whenDone(temp);
+					} else {
+						numberCallback.whenCanceled();
+					}
+				}
+			}
+			}
+		}
+	}
+	
+	public void pickNumber(PickNumberCallback pncb) {
+		numberCallback = pncb;
+	}
 }
