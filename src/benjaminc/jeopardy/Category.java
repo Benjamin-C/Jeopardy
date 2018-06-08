@@ -2,6 +2,9 @@ package benjaminc.jeopardy;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -67,14 +70,18 @@ public class Category {
 	
 	@SuppressWarnings("resource")
 	public void parse(File f, int pp) {
+		System.out.println("Opening " + f.getName());
 		try {
 			String line = "";
 			int l = 0;
 			String q = "";
 			String a = "";
 			
+			//LineNumberReader lnr = new LineNumberReader(new FileReader(f));
 			Scanner s = new Scanner(f);
+			System.out.println(s);
 			name = s.nextLine();
+			System.out.println("success?");
 			int pts;
 			while(s.hasNextLine()) {
 				line = s.nextLine();

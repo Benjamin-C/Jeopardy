@@ -152,7 +152,13 @@ public class ActionCenter {
 			Question q = selCat.getQuestion(selQuesNum);
 			if(q.isUsed() == false) {
 				if(q.isDouble()) {
-					gamePanel.displayText(teamLast.getName() + " team double amount:");
+					gamePanel.displayText(teamLast.getName() + "");
+					try {
+						Thread.sleep(5000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					System.out.println("Get double");
 					getDoubleAmount(q);
 				} else {
@@ -196,7 +202,6 @@ public class ActionCenter {
 			@Override public void whenCanceled() { getDoubleAmount(q);} };
 			
 		System.out.println("IsDouble");
-		System.out.println(pickNumberCallback);
 		teamLast.getNumber(pickNumberCallback);
 		if(teamLast.getWager() <= teamLast.getScore()) {
 			if(teamLast.getWager() >= 0) { wager = teamLast.getWager(); } else {

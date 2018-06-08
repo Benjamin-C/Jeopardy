@@ -86,7 +86,6 @@ public class Team implements TCPOnDataArrival{
 			pickNumber(pnc);
 		} else {
 			System.out.println("Picking num");
-			System.out.println(actionCenter + " " + pnc + " " + name + " " + color);
 			actionCenter.pickNumber(new PickNumberCallback() {
 				@Override public void whenDone(int n) { pnc.whenDone(n); }
 				@Override public void whenCanceled() { pnc.whenCanceled(); } },

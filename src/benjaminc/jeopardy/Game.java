@@ -136,9 +136,9 @@ public class Game {
 				setMode(Mode.INIT);
 				actionCenter.setSyncObject(sync);
 				Util.pause(sync); // Wait for commander to be ready
-				beginNormalRound(new String[] {"cooking", "doit", "flag", "hiking", "lashings", "lifeordeath"}, 1);
+				beginNormalRound(new String[] {"cooking", "flag", "doit", "hiking", "firstaid", "lifeordeath"}, 1);
 				Util.pause(sync); // Wait for round one to be done
-				beginNormalRound(new String[] {"fire", "firstaid", "knives", "knots", "scoutstuff", "water"}, 2);
+				beginNormalRound(new String[] {"doit", "lashings", "knives", "knots", "scoutstuff", "water"}, 2);
 				Util.pause(sync); // wait for round two to be done
 				System.out.println("Round 2 done");
 				System.exit(0);

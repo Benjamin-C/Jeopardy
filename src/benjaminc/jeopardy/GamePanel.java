@@ -153,6 +153,8 @@ public class GamePanel{
 	
 	@SuppressWarnings("serial")
 	public boolean displayText(String text, Color c) {
+		System.out.println("DisplayText " + text);
+		System.out.println("Starting test");
 		String tempTextForPrinting = text;
 		if(tempTextForPrinting.contains("\n")) {
 			for(int i = 0; i < tempTextForPrinting.length(); i++) {
@@ -168,6 +170,7 @@ public class GamePanel{
 		panel = new JPanel() {
         	@Override
             public void paintComponent(Graphics g) {
+        		System.out.println("Painting " + text);
                 super.paintComponent(g);
                 g.setColor(Color.BLACK);
                 g.fillRect(0,  0,  getWidth(), getHeight());
