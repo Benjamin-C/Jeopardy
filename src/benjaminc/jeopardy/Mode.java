@@ -14,5 +14,6 @@ public enum Mode {
 	FINAL_CORRECT,
 	RESULTS,
 	SCORE,
-	PICK_NUMBER;
+	PICK_NUMBER,
+	DONE;
 }

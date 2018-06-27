@@ -25,13 +25,22 @@ public class GamePanel{
 	
 	private Color textColor;
 	
-	public GamePanel(JFrame j, List<Team> teams) {
+	private Game game;
+	
+	public GamePanel(Game g, JFrame j, List<Team> teams) {
 		jf = j;
+		game = g;
 		this.teams = teams;
 		jf.setTitle("Jeopardy");
 		jf.setSize(1280, 720);
 		jf.setVisible(true);
-		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		jf.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		jf.addWindowListener(new java.awt.event.WindowAdapter() {
+		    @Override
+		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+		        game.exit();
+		    }
+		});
 		ImageIcon img = new ImageIcon("icon.png");
 		jf.setIconImage(img.getImage());
 		selCat = -1;
@@ -153,24 +162,16 @@ public class GamePanel{
 	
 	@SuppressWarnings("serial")
 	public boolean displayText(String text, Color c) {
-		System.out.println("DisplayText " + text);
-		System.out.println("Starting test");
-		String tempTextForPrinting = text;
-		if(tempTextForPrinting.contains("\n")) {
-			for(int i = 0; i < tempTextForPrinting.length(); i++) {
-				if(tempTextForPrinting.charAt(i) == '\n') {
-					tempTextForPrinting = tempTextForPrinting.substring(0,  i - 1) + "\\n" + tempTextForPrinting.substring(i);
-				}
-			}
-		}
-		System.out.println("Showing text: " + tempTextForPrinting);
+		final String tempTextForPrinting;
+		tempTextForPrinting = text.replace('\n','\\');
+		System.out.println("Showing text: " + tempTextForPrinting + " | color: " + c.toString());
 		if(text.equals(null)) {
 			return false;
 		}
 		panel = new JPanel() {
         	@Override
             public void paintComponent(Graphics g) {
-        		System.out.println("Painting " + text);
+        		System.out.println("Painting " + tempTextForPrinting);
                 super.paintComponent(g);
                 g.setColor(Color.BLACK);
                 g.fillRect(0,  0,  getWidth(), getHeight());

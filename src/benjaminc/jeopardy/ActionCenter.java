@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import java.util.List;
-
 import benjaminc.util.Util;
 
 public class ActionCenter {
@@ -101,13 +100,16 @@ public class ActionCenter {
 	 * Mark all but one question done to make the game faster
 	 */
 	public void fastGame() {
+		System.out.println("Speeding things up a bit");
 		boolean isOpen = false;
 		for(Category c : cat) {
 			for(Question q : c.getQuestions()) {
-				if(isOpen) {
-					q.setIsUsed(true);
-				} else {
-					isOpen = true;
+				if(!q.isUsed()) {
+					if(isOpen) {
+						q.setIsUsed(true);
+					} else {
+						isOpen = true;
+					}
 				}
 			}
 		}
@@ -149,35 +151,27 @@ public class ActionCenter {
 	 */
 	public void selectQuestion() {
 		if(selCat != null && selQuesNum >= 0 && selQuesNum < selCat.size()) {
-			Question q = selCat.getQuestion(selQuesNum);
-			if(q.isUsed() == false) {
-				if(q.isDouble()) {
-					gamePanel.displayText(teamLast.getName() + "");
-					try {
-						Thread.sleep(5000);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+			selQues = selCat.getQuestion(selQuesNum);
+			if(selQues.isUsed() == false) {
+				if(selQues.isDouble()) {
+					//gamePanel.displayText(teamLast.getName() + "", teamLast.getColor());
 					System.out.println("Get double");
-					getDoubleAmount(q);
+					getDoubleAmount(selQues.getScore() * 2);
 				} else {
 					for(Team t : teams) {
 						t.setGuessed(false);
 					}
-					gamePanel.displayText(q.getQuestion());
-					q.setIsUsed(true);
-					selQues = q;
+					gamePanel.displayText(selQues.getQuestion());
+					selQues.setIsUsed(true);
 					game.setMode(Mode.BUZZ);
 				}
 				
 			}
 		}
 	}
-	private void afterDouble(Question q) {
-		gamePanel.displayText(q.getQuestion());
-		q.setIsUsed(true);
-		selQues = q;
+	private void afterDouble() {
+		gamePanel.displayText(selQues.getQuestion());
+		selQues.setIsUsed(true);
 		buzz(teamLast);
 		game.setMode(Mode.ANSWER);
 	}
@@ -190,24 +184,25 @@ public class ActionCenter {
 	/**
 	 * Gets the amount for Double Jeopardy
 	 */
-	public void getDoubleAmount(Question q) {
+	public void getDoubleAmount(int max) {
 		PickNumberCallback pickNumberCallback = new PickNumberCallback() { 
 			@Override public void whenDone(int n) {
-				if(n <= teamLast.getScore()) {
-					if(n >= 0) { wager = n; afterDouble(q); } else {
-						System.out.println("Need bigger than 0"); getDoubleAmount(q);
+				if(n <= max) {
+					if(n >= 0) { wager = n; teamLast.setWager(n); afterDouble(); } else {
+						System.out.println("Need bigger than 0"); getDoubleAmount(max);
 				} } else {
-					System.out.println("Must be less than team score"); getDoubleAmount(q);}
+					System.out.println("Must be less than 2x question score"); getDoubleAmount(max);
+				}	
 				}
-			@Override public void whenCanceled() { getDoubleAmount(q);} };
+			@Override public void whenCanceled() { getDoubleAmount(max);} };
 			
 		System.out.println("IsDouble");
 		teamLast.getNumber(pickNumberCallback);
-		if(teamLast.getWager() <= teamLast.getScore()) {
+		if(teamLast.getWager() <= max) {
 			if(teamLast.getWager() >= 0) { wager = teamLast.getWager(); } else {
-				System.out.println("Need bigger than 0"); getDoubleAmount(q);
+				System.out.println("Need bigger than 0"); getDoubleAmount(max);
 		} } else {
-			System.out.println("Must be less than team score"); getDoubleAmount(q);
+			System.out.println("Must be less than team score"); getDoubleAmount(max);
 		}
 	}
 	
@@ -232,7 +227,8 @@ public class ActionCenter {
 		System.out.println("Getting number");
 		num = 0;
 		selNumLabel = label;
-		gamePanel.displayText(selNumLabel + " \n" + num);
+		gamePanel.displayText(selNumLabel + "\n" + num, c);
+		System.out.println("No block yet ...");
 		game.setMode(Mode.PICK_NUMBER);
 		teamModColor = c;
 	}
@@ -246,13 +242,11 @@ public class ActionCenter {
 			isNumberNegitive = !isNumberNegitive;
 		} else {
 			num = (num * 10) + d;
-			System.out.println(num);
 		}
 		String n = "";
 		if(isNumberNegitive) {
 			n = "-";
 		}
-		System.out.println(n + num);
 		gamePanel.displayText(selNumLabel + "\n" + n + num, teamModColor);
 		if(game.getMode() == Mode.WAGER) {
 			gamePanel.displayText(selNumLabel + " \n" + num);
@@ -351,6 +345,7 @@ public class ActionCenter {
 	 */
 	public void teamAnsworedCorrectly() {
 		gamePanel.displayText(selQues.getAnswer()); // Show answer
+		System.out.println(selQues.isDouble() + " " + teamLast.getWager());
 		if(selQues.isDouble()) {
 			teamLast.addScore(teamLast.getWager());
 		} else {
@@ -420,9 +415,11 @@ public class ActionCenter {
 	 * @param n		The int number of the team
 	 */
 	public void buzz(Team t) {
-		teamAns = t;
-		gamePanel.displayText(selQues.getQuestion(), t.getColor());
-		game.setMode(Mode.ANSWER);
+		if(!t.hasGuessed()) {
+			teamAns = t;
+			gamePanel.displayText(selQues.getQuestion(), t.getColor());
+			game.setMode(Mode.ANSWER);
+		}
 	}
 	
 	//--------------------------------

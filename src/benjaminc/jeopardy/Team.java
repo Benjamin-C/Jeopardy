@@ -86,13 +86,24 @@ public class Team implements TCPOnDataArrival{
 			pickNumber(pnc);
 		} else {
 			System.out.println("Picking num");
+			System.out.println("|" + name + "|");
 			actionCenter.pickNumber(new PickNumberCallback() {
 				@Override public void whenDone(int n) { pnc.whenDone(n); }
 				@Override public void whenCanceled() { pnc.whenCanceled(); } },
-				name + " Team Wager:\n", color
+				name + " Team Wager:", color
 			);
+			System.out.println("No block yet ...");
 		}
 	}
+	
+	public void pickNumber(PickNumberCallback pncb) {
+		if(inputMode != InputMode.APP) {
+			actionCenter.pickNumber(pncb,  name,  color);
+		} else {
+			numberCallback = pncb;
+		}
+	}
+	
 	
 	public InputMode getInputMode() {
 		return inputMode;
@@ -141,15 +152,7 @@ public class Team implements TCPOnDataArrival{
 			}
 		}
 	}
-	
-	public void pickNumber(PickNumberCallback pncb) {
-		if(inputMode != InputMode.APP) {
-			actionCenter.pickNumber(pncb,  name,  color);
-		} else {
-			numberCallback = pncb;
-		}
-	}
-	
+
 	public void buzz() {
 		actionCenter.buzz(this);
 	}

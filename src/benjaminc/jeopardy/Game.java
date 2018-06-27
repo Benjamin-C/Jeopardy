@@ -45,21 +45,27 @@ public class Game {
 	
 	public Game(InputMode inMode) {
 		// Setup logger
-		DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+		DateFormat logPath = new SimpleDateFormat("yyyy/MM/dd");
+		DateFormat logName = new SimpleDateFormat("yyyyMMddHHmmss");
 		Date cal = new Date();
-		System.out.println("logname = " + dateFormat.format(cal) + ".txt"); //2016/11/16 12:08:43
-		try { logPrintStream = new PrintStream("logs/" + dateFormat.format(cal) + ".txt"); } catch (FileNotFoundException e1) { e1.printStackTrace(); }
+		String logPathStr = "logs/" + logPath.format(cal);
+		String logNameStr = logName.format(cal) + ".txt";
+		System.out.println("logname =" + logPathStr  + "/" + logNameStr);
+		File f = new File(logPathStr);
+		f.mkdirs();
+		try { logPrintStream = new PrintStream(new PrintStream(logPathStr + "/" + logNameStr), true); } catch (FileNotFoundException e1) { e1.printStackTrace(); }
 		outputPrintStream = new PrintStreamDuplicator(logPrintStream, System.out);
 		tracedPrintStream = new TracedPrintStream(outputPrintStream, true);
 		System.setOut(tracedPrintStream);
 		System.setErr(outputPrintStream);
+		System.out.println("Jeopardy");
+		logPrintStream.flush();
 		
 		// Init vars
 		inputMode = inMode;
 				
 		// Set up teams
 		teams = new ArrayList<Team>();
-		System.out.println(actionCenter);
 		
 		// Make the JFrame to see things
 		jf = new JFrame();
@@ -68,7 +74,7 @@ public class Game {
 		mode = Mode.INIT;
 		
 		// Create the main parts of the game
-		gamePanel = new GamePanel(jf, teams);
+		gamePanel = new GamePanel(this, jf, teams);
 		actionCenter = new ActionCenter(gamePanel, this, teams);
 		keyListen = new KeyListen(this, actionCenter);
 		
@@ -141,7 +147,8 @@ public class Game {
 				beginNormalRound(new String[] {"doit", "lashings", "knives", "knots", "scoutstuff", "water"}, 2);
 				Util.pause(sync); // wait for round two to be done
 				System.out.println("Round 2 done");
-				System.exit(0);
+				gamePanel.showScores();
+				setMode(Mode.DONE);
 			}
 		};
 		t.start();
@@ -156,29 +163,26 @@ public class Game {
 		}
 		Random r = new Random();
 		int doubles = 0;
+//		Category c = cat.get(0);
+//		Question q = c.getQuestion(0);
 		while(doubles < numDoubles) {
 			Category c = cat.get(r.nextInt(cat.size()));
 			Question q = c.getQuestion(r.nextInt(c.size()));
+			
 			if(!q.isDouble()) {
 				q.setDouble(true);
 				doubles++;
 				System.out.println("Added double>" + c.getName() + ":" + q.getScore());
 			}
+			c = cat.get(r.nextInt(cat.size()));
+			q = c.getQuestion(r.nextInt(c.size()));
 		}
 		gamePanel.drawMainPanel(cat);
 		actionCenter.setQuestions(cat);
 		setMode(Mode.SELECT);
 	}
 	public void beginFinalRound() {
-		gamePanel.displayText("Final Jeopardy");
-		List<Category> roundTwo = new ArrayList<Category>();
-		String namesTwo[] = {"final"};
-		for(int i = 0; i < namesTwo.length; i++) {
-			Category temp = new Category("");
-			temp.parse(new File("catagories/" + namesTwo[i] + ".jep"), 400);
-			roundTwo.add(temp);
-		}
-		actionCenter.setQuestions(roundTwo);
+		
 	}
 	
 	public Mode getMode() {
@@ -192,5 +196,12 @@ public class Game {
 	
 	public List<Team> getTeams() {
 		return teams;
+	}
+	
+	public void exit() {
+		System.out.println("Goodby");
+		logPrintStream.close();
+		scan.close();
+		System.exit(0);
 	}
 }

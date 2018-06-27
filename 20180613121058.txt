@@ -1,0 +1,8 @@
+[1528917058183] main (Main:19)> benjaminc.jeopardy.Game.<init>(Game.java:61): Jeopardy
+[1528917058183] main (Main:19)> benjaminc.jeopardy.Game.<init>(Game.java:69): null
+[1528917058408] main (Main:19)> benjaminc.jeopardy.Game.<init>(Game.java:118): allowing keyboard buzzing
+[1528917058409] main (Main:20)>(Game:138)>(GamePanel:160)> benjaminc.jeopardy.GamePanel.displayText(GamePanel.java:167): Showing text: Jeopardy
+[1528917058411] RoundSelector (Game:143)> benjaminc.jeopardy.Game.setMode(Game.java:202): Setting mode to INIT
+[1528917058410] AWT-EventQueue-0  benjaminc.jeopardy.GamePanel$3.paintComponent(GamePanel.java:174): Painting Jeopardy
+[1528917058411] RoundSelector (Game:145)> benjaminc.util.Util.pause(Util.java:8): Pausing a thread
+[1528917059677] AWT-EventQueue-0 (GamePanel:41)> benjaminc.jeopardy.Game.exit(Game.java:210): Goodby
