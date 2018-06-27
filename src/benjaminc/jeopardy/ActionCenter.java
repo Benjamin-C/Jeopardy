@@ -205,7 +205,9 @@ public class ActionCenter {
 		}
 	}
 	public void afterFinal(String ans) {
-		for(int i = 0; i < teams.size(); i++)
+		for(int i = 0; i < teams.size(); i++) {
+			
+		}
 	}
 	//--------------------------------
 	//   _   _                     
