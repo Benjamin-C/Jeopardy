@@ -15,5 +15,6 @@ public enum Mode {
 	RESULTS,
 	SCORE,
 	PICK_NUMBER,
-	DONE;
+	DONE,
+	CRASH;
 }

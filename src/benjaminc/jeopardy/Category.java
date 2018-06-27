@@ -76,7 +76,7 @@ public class Category {
 			
 			Scanner s = new Scanner(f);
 			name = s.nextLine();
-					
+
 			int pts;
 			while(s.hasNextLine()) {
 				line = s.nextLine();

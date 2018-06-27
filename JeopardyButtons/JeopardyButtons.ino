@@ -17,25 +17,25 @@ void loop() {
     if(r <= 0) {
       Serial.println("9");
     }
-    r = 3;
+    r = 100;
    } 
    if(y <= 0 && digitalRead(10) == LOW) {
      if(y <= 0) {
       Serial.println("a");
     }
-    y = 3;
+    y = 100;
    } 
    if(g <= 0 && digitalRead(11) == LOW) {
      if(g <= 0) {
       Serial.println("b");
     }
-    g = 3;
+    g = 100;
    } 
    if(b <= 0 && digitalRead(12) == LOW) {
      if(b <= 0) {
       Serial.println("c");
     }
-    b = 3;
+    b = 100;
    }
    if(next < millis()) {
      if(r > -1) {

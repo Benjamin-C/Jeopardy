@@ -5,6 +5,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.text.DateFormat;
@@ -48,6 +49,8 @@ public class Game {
 	private String[] roundFinalQuestions;
 	
 	private final Object sync;
+	
+	private Serial serialInput;
 	
 	public Game(InputMode inMode, String[] roundOneCategories, String[] roundTwoCategories, String[] roundFinalQuestions) {
 		// Setup logger
@@ -96,6 +99,13 @@ public class Game {
 		this.roundTwoCategories = roundTwoCategories;
 		this.roundFinalQuestions = roundFinalQuestions;
 		
+		// Activate key listeners for commander
+		jf.addKeyListener(new KeyListener() {
+			@Override public void keyTyped(KeyEvent e) {keyListen.keyTyped(e);}
+			@Override public void keyReleased(KeyEvent e) {keyListen.keyReleased(e);}
+			@Override public void keyPressed(KeyEvent e) {keyListen.keyPressed(e);}
+		});
+				
 		// Setup input modes
 		switch(inputMode) {
 		case APP:  {
@@ -127,15 +137,41 @@ public class Game {
 		//break;
 		//case ARDUINO: try { Serial.begin(actionCenter); } catch (Exception e1) { System.out.println("Something went wrong initializing the arduino!"); /*System.exit(1);*/ }; break;
 		case KEYBOARD: System.out.println("allowing keyboard buzzing");keyListen.mayTeamsBuzzByKeyboard(true); break;
-		case ARDUINO: System.out.println("This mode is not avaliable. Quitting ..."); System.exit(0); break;
+		case ARDUINO: {
+			keyListen.mayTeamsBuzzByKeyboard(true);
+			SerialEvent se = new SerialEvent() {
+				
+				@Override
+				public void onDataAvaliable(byte data) {
+					if(data != 13 && data != 10) {
+						System.out.println("Serial:" + (data & 0xFF) + " " + (char) data);
+					} else {
+						System.out.println("Serial:" + (data & 0xFF) + " \\n");
+					}
+					if(getMode() == Mode.BUZZ) {
+						switch((char) data) {
+						case '9': { actionCenter.buzz(teams.get(0)); } break;
+						case 'a': { actionCenter.buzz(teams.get(1)); } break;
+						case 'b': { actionCenter.buzz(teams.get(2)); } break;
+						case 'c': { actionCenter.buzz(teams.get(3)); } break;
+						case '♪': { System.out.println("Line Break"); } break;
+					}
+				} }
+				
+				@Override
+				public void IOException(IOException e) { System.out.println(e); gamePanel.displayText(e.getMessage()); }
+			};
+			System.out.println(Serial.getPorts());
+			try {
+				serialInput = new Serial(Serial.getPorts().get(0), 250000, se);
+				serialInput.startListening();
+			} catch(NullPointerException e) {
+				setMode(Mode.CRASH);
+				gamePanel.displayText(e.getMessage());
+				Util.pause(new Object());
+			}
+		} break;
 		}
-		
-		// Activate key listeners for commander
-		jf.addKeyListener(new KeyListener() {
-			@Override public void keyTyped(KeyEvent e) {keyListen.keyTyped(e);}
-			@Override public void keyReleased(KeyEvent e) {keyListen.keyReleased(e);}
-			@Override public void keyPressed(KeyEvent e) {keyListen.keyPressed(e);}
-		});
 		
 		// Null Category
 		List<Category> nullCatList = new ArrayList<Category>();

@@ -19,14 +19,19 @@ public class Serial {
 	private Thread listener;
 	private volatile boolean isListening;
 	
-	public Serial(String portName, int baudRate, SerialEvent onDataAvaliable) {
+	public Serial(String portName, int baudRate, SerialEvent onDataAvaliable) throws NullPointerException {
 		this.portName = portName;
 		this.onDataAvaliable = onDataAvaliable;
 		this.baudRate = baudRate;
 		serial = new NRSerialPort(portName, baudRate);
-		//serial.connect();
-		//ins = new DataInputStream(serial.getInputStream());
-		//outs = new DataOutputStream(serial.getOutputStream());
+		serial.connect();
+		try {
+			ins = new DataInputStream(serial.getInputStream());
+			outs = new DataOutputStream(serial.getOutputStream());
+		} catch(NullPointerException e) {
+			System.out.println(e.getMessage());
+			throw new NullPointerException("Crashed, the serial port is probibly busy. Try closing all Jeopardy windows then try again.");
+		}
 		listener = null;
 		isListening = false;
 	}
@@ -40,24 +45,28 @@ public class Serial {
 	}
 	
 	public void print(String data) {
-		
+
 	}
 	public void println(String data) {
 		print(data + "\n");
 	}
 	
 	public void startListening() {
-		if(listener != null && !listener.isAlive()) {
+		System.out.println(listener);
+		if(listener == null || !listener.isAlive()) {
 			System.out.println("Starting listenign");
 			isListening = true;
-			listener = new Thread() {
+			listener = new Thread("SerialListener") {
 				@Override
 				public void run() { // Do thread stuff
 					while(isListening) { // If listening
 						try {
 							if(ins.available() > 0) { // If there is data to read
 								try {
-									onDataAvaliable.onDataAvaliable(ins.readByte()); // Send the data to the reciver
+									byte b = ins.readByte();
+									System.out.println(ins.available());
+									System.out.println(b);
+									onDataAvaliable.onDataAvaliable(b); // Send the data to the reciver
 								} catch (IOException e) {
 									onDataAvaliable.IOException(e); // send an IOException to the reciever if nessary
 								}
@@ -65,9 +74,16 @@ public class Serial {
 						} catch (IOException e) {
 							onDataAvaliable.IOException(e); // send an IOException to the reciever if nessary
 						}
+						try {
+							Thread.sleep(1);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					} // Will close if not listening
 				}
 			};
+			listener.start();
 		}
 	}
 	

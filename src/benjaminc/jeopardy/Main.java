@@ -16,8 +16,8 @@ public class Main {
 	
 	public static void main(String args[]) {
 		System.out.println("Jeopardy");
-		Game game = new Game(InputMode.KEYBOARD,
-				new String[] {"cooking", "flag", "doit", "hiking", "firstaid", "lifeordeath"},
+		Game game = new Game(InputMode.ARDUINO,
+				new String[] {"knots", "fire", "doit", "hiking", "firstaid", "lifeordeath"},
 				new String[] {"doit", "lashings", "knives", "knots", "scoutstuff", "water"},
 				new String[] {"Final Jeopardy", "What is this"} );
 		game.begin();
