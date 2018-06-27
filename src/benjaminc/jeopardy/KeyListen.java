@@ -131,8 +131,12 @@ public class KeyListen {
 					actionCenter.begin();
 				}
 			} break;
-			case FINAL_CORRECT:
-				break;
+			case FINAL_CORRECT: {
+				switch(key) {
+				case KeyEvent.VK_BACK_SPACE: actionCenter.isFinalCorrect(true); break;
+				case KeyEvent.VK_BACK_SLASH: actionCenter.isFinalCorrect(false); break;
+				}
+			} break;
 			case RESULTS:
 				break;
 			case SCORE:

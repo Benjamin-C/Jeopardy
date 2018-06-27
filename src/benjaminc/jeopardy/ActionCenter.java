@@ -39,7 +39,10 @@ public class ActionCenter {
 	private Color teamModColor;
 	
 	// Double Jeopardy variables
-	int wager;
+	private int wager;
+	
+	// Final Jeopardy variables
+	private int finalLocation;
 	
 	public ActionCenter(GamePanel gp, Game g, List<Team> team) {	
 		num = 0;
@@ -205,8 +208,25 @@ public class ActionCenter {
 		}
 	}
 	public void afterFinal(String ans) {
-		for(int i = 0; i < teams.size(); i++) {
-			
+		selQues = new Question("", ans);
+		game.setMode(Mode.FINAL_CORRECT);
+		finalLocation = 0;
+		teamAns = teams.get(finalLocation);
+		gamePanel.displayText(selQues.getAnswer(), teamAns.getColor());
+	}
+	
+	public void isFinalCorrect(boolean cor) {
+		if(cor) {
+			teamAns.addScore(teamAns.getWager());
+		} else {
+			teamAns.addScore(-1 * teamAns.getWager());
+		}
+		if(finalLocation < teams.size() - 1) {
+			finalLocation++;
+			teamAns = teams.get(finalLocation);
+			gamePanel.displayText(selQues.getAnswer(), teamAns.getColor());
+		} else {
+			Util.resume(sync);
 		}
 	}
 	//--------------------------------

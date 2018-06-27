@@ -152,12 +152,12 @@ public class Game {
 			public void run() {
 				setMode(Mode.INIT);
 				actionCenter.setSyncObject(sync);
-//				Util.pause(sync); // Wait for commander to be ready
-//				beginNormalRound(roundOneCategories, 1);
-//				Util.pause(sync); // Wait for round one to be done
-//				beginNormalRound(roundTwoCategories, 2);
-//				Util.pause(sync); // wait for round two to be done
-//				System.out.println("Round 2 done");
+				Util.pause(sync); // Wait for commander to be ready
+				beginNormalRound(roundOneCategories, 1);
+				Util.pause(sync); // Wait for round one to be done
+				beginNormalRound(roundTwoCategories, 2);
+				Util.pause(sync); // wait for round two to be done
+				System.out.println("Round 2 done");
 				doFinalRound();
 				gamePanel.showScores();
 				setMode(Mode.DONE);
@@ -201,7 +201,9 @@ public class Game {
 		gamePanel.displayText(roundFinalQuestions[0]);
 		setMode(Mode.FINAL_JEOPARDY);
 		Util.pause(sync);
-		gamePanel.displayText(roundFinalQuestions[1]);
+		actionCenter.afterFinal(roundFinalQuestions[1]);
+		Util.pause(sync);
+		gamePanel.showScores();
 	}
 	
 	public void getTeamWager(final int max, final Team t) {
