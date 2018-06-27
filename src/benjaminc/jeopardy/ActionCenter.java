@@ -156,7 +156,7 @@ public class ActionCenter {
 				if(selQues.isDouble()) {
 					//gamePanel.displayText(teamLast.getName() + "", teamLast.getColor());
 					System.out.println("Get double");
-					getDoubleAmount(selQues.getScore() * 2);
+					getTeamWager(selQues.getScore() * 2, teamLast);
 				} else {
 					for(Team t : teams) {
 						t.setGuessed(false);
@@ -184,28 +184,29 @@ public class ActionCenter {
 	/**
 	 * Gets the amount for Double Jeopardy
 	 */
-	public void getDoubleAmount(int max) {
+	public void getTeamWager(int max, Team t) {
 		PickNumberCallback pickNumberCallback = new PickNumberCallback() { 
 			@Override public void whenDone(int n) {
 				if(n <= max) {
-					if(n >= 0) { wager = n; teamLast.setWager(n); afterDouble(); } else {
-						System.out.println("Need bigger than 0"); getDoubleAmount(max);
+					if(n >= 0) { wager = n; t.setWager(n); afterDouble(); } else {
+						System.out.println("Need bigger than 0"); getTeamWager(max, t);
 				} } else {
-					System.out.println("Must be less than 2x question score"); getDoubleAmount(max);
+					System.out.println("Must be less than 2x question score"); getTeamWager(max, t);
 				}	
 				}
-			@Override public void whenCanceled() { getDoubleAmount(max);} };
-			
+			@Override public void whenCanceled() { getTeamWager(max, t);} };
 		System.out.println("IsDouble");
-		teamLast.getNumber(pickNumberCallback);
-		if(teamLast.getWager() <= max) {
-			if(teamLast.getWager() >= 0) { wager = teamLast.getWager(); } else {
-				System.out.println("Need bigger than 0"); getDoubleAmount(max);
+		t.getNumber(pickNumberCallback);
+		if(t.getWager() <= max) {
+			if(t.getWager() >= 0) { wager = t.getWager(); } else {
+				System.out.println("Need bigger than 0"); getTeamWager(max, t);
 		} } else {
-			System.out.println("Must be less than team score"); getDoubleAmount(max);
+			System.out.println("Must be less than team score"); getTeamWager(max, t);
 		}
 	}
-	
+	public void afterFinal(String ans) {
+		for(int i = 0; i < teams.size(); i++)
+	}
 	//--------------------------------
 	//   _   _                     
 	//  | \ | |                    

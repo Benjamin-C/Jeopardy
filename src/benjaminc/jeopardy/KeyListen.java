@@ -126,9 +126,12 @@ public class KeyListen {
 				}
 			}
 			
+			case FINAL_JEOPARDY:  {
+				if(e.getKeyCode() == KeyEvent.VK_ENTER && e.getKeyLocation() == 1) {
+					actionCenter.begin();
+				}
+			} break;
 			case FINAL_CORRECT:
-				break;
-			case FINAL_JEOPARDY:
 				break;
 			case RESULTS:
 				break;

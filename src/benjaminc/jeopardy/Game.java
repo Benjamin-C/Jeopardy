@@ -43,7 +43,13 @@ public class Game {
 	private PrintStream logPrintStream;
 	private PrintStream tracedPrintStream;
 	
-	public Game(InputMode inMode) {
+	private String[] roundOneCategories;
+	private String[] roundTwoCategories;
+	private String[] roundFinalQuestions;
+	
+	private final Object sync;
+	
+	public Game(InputMode inMode, String[] roundOneCategories, String[] roundTwoCategories, String[] roundFinalQuestions) {
 		// Setup logger
 		DateFormat logPath = new SimpleDateFormat("yyyy/MM/dd");
 		DateFormat logName = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -63,7 +69,8 @@ public class Game {
 		
 		// Init vars
 		inputMode = inMode;
-				
+		sync = new Object();
+		
 		// Set up teams
 		teams = new ArrayList<Team>();
 		
@@ -83,6 +90,11 @@ public class Game {
 		teams.add(new Team(actionCenter, Color.YELLOW, "Yellow", null));
 		teams.add(new Team(actionCenter, Color.GREEN, "Green", null));
 		teams.add(new Team(actionCenter, Color.CYAN, "Blue", null));
+		
+		// Set up category lists
+		this.roundOneCategories = roundOneCategories;
+		this.roundTwoCategories = roundTwoCategories;
+		this.roundFinalQuestions = roundFinalQuestions;
 		
 		// Setup input modes
 		switch(inputMode) {
@@ -137,16 +149,16 @@ public class Game {
 		gamePanel.displayText("Jeopardy");
 		keyListen.enable();
 		Thread t = new Thread("RoundSelector") {
-			Object sync = new Object();
 			public void run() {
 				setMode(Mode.INIT);
 				actionCenter.setSyncObject(sync);
-				Util.pause(sync); // Wait for commander to be ready
-				beginNormalRound(new String[] {"cooking", "flag", "doit", "hiking", "firstaid", "lifeordeath"}, 1);
-				Util.pause(sync); // Wait for round one to be done
-				beginNormalRound(new String[] {"doit", "lashings", "knives", "knots", "scoutstuff", "water"}, 2);
-				Util.pause(sync); // wait for round two to be done
-				System.out.println("Round 2 done");
+//				Util.pause(sync); // Wait for commander to be ready
+//				beginNormalRound(roundOneCategories, 1);
+//				Util.pause(sync); // Wait for round one to be done
+//				beginNormalRound(roundTwoCategories, 2);
+//				Util.pause(sync); // wait for round two to be done
+//				System.out.println("Round 2 done");
+				doFinalRound();
 				gamePanel.showScores();
 				setMode(Mode.DONE);
 			}
@@ -181,10 +193,47 @@ public class Game {
 		actionCenter.setQuestions(cat);
 		setMode(Mode.SELECT);
 	}
-	public void beginFinalRound() {
-		
+	public void doFinalRound() {
+		for(int i = 0; i < teams.size(); i++) {
+			Team t = teams.get(i);
+			getTeamWager(t.getScore(), t);
+		}
+		gamePanel.displayText(roundFinalQuestions[0]);
+		setMode(Mode.FINAL_JEOPARDY);
+		Util.pause(sync);
+		gamePanel.displayText(roundFinalQuestions[1]);
 	}
 	
+	public void getTeamWager(final int max, final Team t) {
+		Object sncObj = new Object();
+		Thread th = new Thread("Pick-Num") {
+			private PickNumberCallback pickNumberCallback;
+			@Override
+			public void run() {
+				pickNumberCallback = new PickNumberCallback() { 
+					@Override public void whenDone(int n) {
+						if(n <= max) {
+							if(n >= 0) { t.setWager(n); Util.resume(sncObj); } else {
+								System.out.println("Need bigger than 0"); getNum();
+							} } else {
+								System.out.println("Must be less than 2x question score"); getNum();
+							}	
+					}
+					@Override public void whenCanceled() { getTeamWager(max, t);
+					}
+				};
+				System.out.println("IsDouble");
+				getNum();
+			}
+			
+			private void getNum() {
+				t.getNumber(pickNumberCallback);
+			}
+		};
+		th.start();
+		Util.pause(sncObj);
+	}
+
 	public Mode getMode() {
 		return mode;
 	}

@@ -16,7 +16,10 @@ public class Main {
 	
 	public static void main(String args[]) {
 		System.out.println("Jeopardy");
-		Game game = new Game(InputMode.KEYBOARD);
+		Game game = new Game(InputMode.KEYBOARD,
+				new String[] {"cooking", "flag", "doit", "hiking", "firstaid", "lifeordeath"},
+				new String[] {"doit", "lashings", "knives", "knots", "scoutstuff", "water"},
+				new String[] {"Final Jeopardy", "What is this"} );
 		game.begin();
 	}
 	
@@ -94,11 +97,6 @@ public class Main {
 		};
 
 		while(true) {}
-	}
-	
-	public void run() {
-		Game game = new Game(InputMode.ARDUINO);
-		game.begin();
 	}
 	
 	@SuppressWarnings("unused")
