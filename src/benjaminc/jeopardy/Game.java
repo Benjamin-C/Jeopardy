@@ -167,7 +167,8 @@ public class Game {
 				serialInput.startListening();
 			} catch(NullPointerException e) {
 				setMode(Mode.CRASH);
-				gamePanel.displayText(e.getMessage());
+				gamePanel.crash(e);
+				//gamePanel.displayText(e.getMessage());
 				Util.pause(new Object());
 			}
 		} break;

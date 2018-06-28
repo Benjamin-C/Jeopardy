@@ -5,6 +5,7 @@ package benjaminc.jeopardy;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.ImageIcon;
@@ -160,7 +161,6 @@ public class GamePanel{
 		return displayText(text, Color.BLUE);
 	}
 	
-	@SuppressWarnings("serial")
 	public boolean displayText(String text, Color c) {
 		final String tempTextForPrinting;
 		tempTextForPrinting = text.replace('\n','\\');
@@ -350,5 +350,55 @@ public class GamePanel{
 			g.setColor(col);
 			g.drawString(text, x, y);
         }
+	}
+	
+	public boolean crash(Throwable e) {
+		List<String> techList = new ArrayList<String>();
+		for(StackTraceElement el : e.getStackTrace()) {
+			techList.add(el.getClassName() + "." + el.getMethodName() + "(" + el.getFileName() + ":" + el.getLineNumber() + ")");
+		}
+		return crash(e.getStackTrace()[0].getFileName(),  e.getMessage(), techList);
+	}
+	
+	public boolean crash(String cause, String msg, List<String> tech) {
+		List<String> text = new ArrayList<String>();
+		text.add("A problem has been detected and Jeopardy has been shut down to avoid damage");
+		text.add("to your computer.");
+		text.add("");
+		text.add("The problem seems to be caused by the following source: " + cause);
+		text.add("");
+		text.add(msg);
+		text.add("");
+		text.add("If this is the first time you've seen this stop error scree,");
+		text.add("restart Jeopardy. If this screen appears again, follow");
+		text.add("these steps:");
+		text.add("");
+		text.add("Check to make sure any new hardware or software is properly installed.");
+		text.add("If this is a new installation, ask your hardware or software manufacutrer");
+		text.add("for any Jeopardy updates you might need.");
+		text.add("If problems continue, disable or remove any newly installed hardware");
+		text.add("or software. Close all other running applications, and restart your computer.");
+		text.add("");
+		text.add("Technical information:");
+		text.add("");
+		text.addAll(tech);
+		
+		panel = new JPanel() {
+        	@Override
+            public void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.setColor(Color.BLUE);
+                g.fillRect(0,  0,  getWidth(), getHeight());
+                g.setFont(new Font("Lucida Console", Font.PLAIN, 18));
+                g.setColor(Color.WHITE);
+                int h = g.getFontMetrics().getHeight() + 5;
+                for(int i = 0; i < text.size(); i++) {
+                	g.drawString(text.get(i), 5, (i*h)+24);
+                }
+        	}
+		};
+		jf.add(panel);
+        jf.validate();
+        return true;
 	}
 }

@@ -30,7 +30,7 @@ public class Serial {
 			outs = new DataOutputStream(serial.getOutputStream());
 		} catch(NullPointerException e) {
 			System.out.println(e.getMessage());
-			throw new NullPointerException("Crashed, the serial port is probibly busy. Try closing all Jeopardy windows then try again.");
+			throw new NullPointerException("SERIAL_PORT_BUSY");
 		}
 		listener = null;
 		isListening = false;
@@ -64,8 +64,6 @@ public class Serial {
 							if(ins.available() > 0) { // If there is data to read
 								try {
 									byte b = ins.readByte();
-									System.out.println(ins.available());
-									System.out.println(b);
 									onDataAvaliable.onDataAvaliable(b); // Send the data to the reciver
 								} catch (IOException e) {
 									onDataAvaliable.IOException(e); // send an IOException to the reciever if nessary
