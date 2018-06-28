@@ -51,10 +51,12 @@ public class Team implements TCPOnDataArrival{
 	
 	public void setScore(int s) {
 		score = s;
+		System.out.println("Team " + name + "score=" + score);
 	}
 	
 	public void addScore(int s) {
 		score += s;
+		System.out.println("Team " + name + "score=" + score);
 	}
 	
 	public boolean hasGuessed() {
